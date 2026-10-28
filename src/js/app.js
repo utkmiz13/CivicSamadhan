@@ -158,7 +158,11 @@ class ApplicationController {
           setTimeout(() => otpInput.focus(), 150);
         }
 
-        this.showToast(res.message || `📧 6-digit OTP sent to ${email}! Check your inbox.`, 'info');
+        if (res.rateLimited && res.fallbackOtp) {
+          this.showToast(`⚠️ Supabase email limit reached (3/hr). For immediate testing, OTP is: ${res.fallbackOtp}`, 'info');
+        } else {
+          this.showToast(res.message || `📧 6-digit OTP sent to ${email}! Check your inbox.`, 'info');
+        }
       } else {
         const res = await apiClient.login({ email, password });
         if (res.success && res.user) {
