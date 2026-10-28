@@ -1,74 +1,42 @@
 # 🏛️ CivicSamadhan (e-CivicSamadhan)
 ### *Centralized Civic Grievance Redressal and Monitoring System*
 
-Inspired by the National Grievance Portal (`samadhaan.ugc.ac.in`), **CivicSamadhan** provides a centralized, single-window digital governance platform for urban civic complaints — connecting Citizens, Municipal Corporations, and Field Contractors with AI Defect Triage, automated geofencing, and verifiable Proof-of-Resolution.
+Inspired by the National Grievance Portal (`samadhaan.ugc.ac.in`), **CivicSamadhan** provides a single-window digital governance platform for urban civic complaints — connecting Citizens, Municipal Corporations, and Field Contractors with AI Defect Triage, automated geofencing, and verifiable Proof-of-Resolution.
+
+---
+
+## 🚀 Live Deployments & Preview
+
+* **GitHub Pages (Live Static App):** [https://utkmiz13.github.io/CivicSamadhan/](https://utkmiz13.github.io/CivicSamadhan/)
+* **Tunnel Live Preview:** [https://beige-queens-brake.loca.lt](https://beige-queens-brake.loca.lt) *(Password: `122.163.177.158`)*
+* **Local Server:** `http://localhost:4000` *(Run via `npm start` or double-clicking `start.command`)*
+
+---
+
+## ⚡ How Data & Auth Work on GitHub Pages
+
+1. **Static Hosting + Cloud Backend:** GitHub Pages serves the frontend, while all database operations (issues, contractors, points) communicate **directly with Supabase Cloud PostgreSQL** in real-time.
+2. **Real Email Confirmation:** When a user signs up on GitHub Pages or Localhost, Supabase Auth automatically dispatches an official confirmation email to their inbox to verify the account!
+3. **Data Persistence:** Every reported pothole, garbage dump, streetlight hazard, and point redemption is permanently committed to your Supabase Cloud database.
 
 ---
 
 ## 📁 System Architecture
 
 ```
-Smadhaan/
-├── backend/                       # Node.js REST API & Supabase Integration
-│   ├── src/
-│   │   ├── config/
-│   │   │   └── supabase.js        # Supabase Cloud Client with Local Fallback
-│   │   ├── controllers/
-│   │   │   ├── issueController.js # Grievance Lifecycle: Lodge, Assign, Resolve, Verify
-│   │   │   ├── statsController.js # Citywide Telemetry, KPIs, Leaderboard
-│   │   │   └── authController.js  # Role Switching (Citizen, Municipal, Contractor)
-│   │   ├── middleware/
-│   │   │   └── rbac.js            # Role-Based Access Control guards
-│   │   ├── routes/
-│   │   │   └── index.js           # REST API routes
-│   │   ├── services/
-│   │   │   └── aiTriage.js        # AI classification & 45m duplicate detection
-│   │   └── data/
-│   │       ├── seed.json          # Seed civic dataset
-│   │       ├── storage.json       # Auto-synced datastore
-│   │       └── schema.sql         # Supabase PostgreSQL schema
-│   ├── .env                       # Live Supabase project credentials
-│   ├── package.json
-│   └── server.js                  # HTTP Server (Port 4000)
-│
-├── frontend/                      # e-Samadhan Style Modern Portal
-│   ├── index.html                 # Official government portal UI shell
-│   └── src/
-│       ├── css/
-│       │   └── style.css          # Government portal theme, Ashoka stambh styles
-│       └── js/
-│           ├── api.js             # REST API Client
-│           ├── state.js           # Reactive State & Demo Presets
-│           ├── views/
-│           │   ├── citizenView.js      # Lodge Grievance & Track Status
-│           │   ├── municipalityView.js # GIS Spatial Map & Contractor SLA
-│           │   ├── contractorView.js   # Work Orders & Field Proof Upload
-│           │   └── rewardsView.js      # Civic Tokens & Soulbound Badge
-│           └── app.js             # Master Coordinator
-│
-├── start.command                  # macOS double-click launcher
-├── start.sh                       # Shell launch script
-├── package.json                   # Root package runner (`npm start`)
+CivicSamadhan/
+├── index.html                     # Root entry point for GitHub Pages
+├── src/                           # Frontend assets (CSS, JS, Components)
+│   ├── css/style.css
+│   └── js/
+│       ├── api.js                 # Direct Supabase Cloud REST connector
+│       ├── state.js               # Reactive app state & demo presets
+│       └── views/                 # Citizen, Municipality, Contractor, Rewards
+├── backend/                       # Node.js Server & Local Fallback Engine
+│   ├── src/config/supabase.js     # Supabase Cloud Client
+│   ├── server.js                  # Localhost server (Port 4000)
+│   └── src/data/schema.sql        # Supabase PostgreSQL schema
+├── .github/workflows/deploy.yml   # Automatic GitHub Pages deployment workflow
+├── start.command                  # macOS 1-click launcher
 └── README.md
 ```
-
----
-
-## ⚡ How to Run
-
-1. **Option 1 (Double-Click):** Double-click [start.command](file:///Users/utkarshmishra13/Desktop/Smadhaan/start.command).
-2. **Option 2 (Terminal):**
-   ```bash
-   npm start
-   ```
-3. Opens at `http://localhost:4000`.
-
----
-
-## 🌐 Live Preview (Tunnel)
-
-To expose your local CivicSamadhan portal to the internet for instant preview:
-```bash
-npx --yes localtunnel --port 4000
-```
-Password to unlock on first visit: Check your public IP or visit `https://loca.lt/mytunnelpassword`.
