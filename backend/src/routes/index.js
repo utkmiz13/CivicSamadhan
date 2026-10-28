@@ -22,6 +22,8 @@ const routes = [
   { method: 'POST', path: '/api/reset', handler: statsController.resetData },
 
   // Auth & Session
+  { method: 'POST', path: '/api/auth/send-otp', handler: authController.sendOtp },
+  { method: 'POST', path: '/api/auth/verify-otp', handler: authController.verifyOtp },
   { method: 'POST', path: '/api/auth/signup', handler: authController.signup },
   { method: 'POST', path: '/api/auth/login', handler: authController.login },
   { method: 'POST', path: '/api/rewards/redeem', handler: authController.redeemVoucher }

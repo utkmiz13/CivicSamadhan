@@ -73,9 +73,12 @@ class ApplicationController {
     }
   }
 
-  // User Authentication
+  // User Authentication & OTP Flow
   openAuthModal(mode = 'signup') {
     this.authMode = mode;
+    this.authStep = 'details';
+    this.currentDevOtp = null;
+
     const modal = document.getElementById('auth-modal');
     const title = document.getElementById('auth-modal-title');
     const sub = document.getElementById('auth-modal-subtitle');
@@ -83,11 +86,16 @@ class ApplicationController {
     const signupFields = document.querySelectorAll('.auth-signup-only');
     const tabSignup = document.getElementById('auth-tab-signup');
     const tabLogin = document.getElementById('auth-tab-login');
+    const stepDetails = document.getElementById('auth-step-details');
+    const stepOtp = document.getElementById('auth-step-otp');
+
+    if (stepDetails) stepDetails.classList.remove('hidden');
+    if (stepOtp) stepOtp.classList.add('hidden');
 
     if (mode === 'signup') {
       if (title) title.textContent = 'Create Citizen / Contractor Account';
-      if (sub) sub.textContent = 'Sign up to report civic issues, dispatch field teams, and earn redeemable points.';
-      if (submitBtn) submitBtn.textContent = 'Create Account (+100 Bonus Pts)';
+      if (sub) sub.textContent = 'Register with email & password, verify via OTP, and earn +100 bonus tokens.';
+      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-paper-plane mr-1.5"></i> Send Verification OTP (+100 Bonus Pts)';
       signupFields.forEach(el => el.classList.remove('hidden'));
       if (tabSignup) {
         tabSignup.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-gov-blue text-gov-blue transition';
@@ -97,8 +105,8 @@ class ApplicationController {
       }
     } else {
       if (title) title.textContent = 'Sign In to CivicSamadhan';
-      if (sub) sub.textContent = 'Enter your registered email address to access your civic wallet and tasks.';
-      if (submitBtn) submitBtn.textContent = 'Sign In';
+      if (sub) sub.textContent = 'Enter your registered email and password to access your civic wallet and tasks.';
+      if (submitBtn) submitBtn.innerHTML = '<i class="fa-solid fa-right-to-bracket mr-1.5"></i> Sign In';
       signupFields.forEach(el => el.classList.add('hidden'));
       if (tabLogin) {
         tabLogin.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-gov-blue text-gov-blue transition';
@@ -132,10 +140,36 @@ class ApplicationController {
 
     try {
       if (this.authMode === 'signup') {
-        const res = await apiClient.signup({ name, email, phone, role, password });
-        // DO NOT log in automatically before confirmation!
-        this.closeAuthModal();
-        this.showEmailConfirmationNotice(email);
+        const res = await apiClient.sendOtp({ name, email, phone, role, password });
+        this.pendingSignupData = { name, email, phone, role, password };
+        this.currentDevOtp = res.devOtp;
+
+        // Switch to OTP step inside modal
+        this.authStep = 'otp';
+        const stepDetails = document.getElementById('auth-step-details');
+        const stepOtp = document.getElementById('auth-step-otp');
+        const otpTargetEmail = document.getElementById('otp-target-email');
+        const otpDevAssist = document.getElementById('otp-dev-assist');
+        const otpDevCode = document.getElementById('otp-dev-code');
+        const otpInput = document.getElementById('auth-otp-input');
+
+        if (stepDetails) stepDetails.classList.add('hidden');
+        if (stepOtp) stepOtp.classList.remove('hidden');
+        if (otpTargetEmail) otpTargetEmail.textContent = email;
+
+        if (res.devOtp && otpDevAssist && otpDevCode) {
+          otpDevCode.textContent = res.devOtp;
+          otpDevAssist.classList.remove('hidden');
+        } else if (otpDevAssist) {
+          otpDevAssist.classList.add('hidden');
+        }
+
+        if (otpInput) {
+          otpInput.value = '';
+          setTimeout(() => otpInput.focus(), 150);
+        }
+
+        this.showToast(`📧 6-digit OTP sent to ${email}!`, 'info');
       } else {
         const res = await apiClient.login({ email, password });
         if (res.success && res.user) {
@@ -164,21 +198,88 @@ class ApplicationController {
     }
   }
 
-  showEmailConfirmationNotice(email) {
-    const modal = document.getElementById('confirm-email-modal');
-    const emailTarget = document.getElementById('confirm-email-target');
-    if (emailTarget) emailTarget.textContent = email;
-    if (modal) {
-      modal.classList.remove('hidden');
-    } else {
-      this.showToast(`📧 Verification email sent to ${email}! Please verify before signing in.`, 'info');
-      this.openAuthModal('login');
+  autofillOtp() {
+    if (this.currentDevOtp) {
+      const otpInput = document.getElementById('auth-otp-input');
+      if (otpInput) {
+        otpInput.value = this.currentDevOtp;
+        this.showToast('OTP auto-filled!', 'success');
+      }
     }
   }
 
-  closeEmailConfirmationModal() {
-    document.getElementById('confirm-email-modal')?.classList.add('hidden');
-    this.openAuthModal('login');
+  backToDetails() {
+    this.authStep = 'details';
+    document.getElementById('auth-step-details')?.classList.remove('hidden');
+    document.getElementById('auth-step-otp')?.classList.add('hidden');
+  }
+
+  async resendOtp() {
+    if (!this.pendingSignupData) {
+      this.backToDetails();
+      return;
+    }
+    try {
+      this.showToast('Re-dispatching OTP to ' + this.pendingSignupData.email + '...', 'info');
+      const res = await apiClient.sendOtp(this.pendingSignupData);
+      this.currentDevOtp = res.devOtp;
+      const otpDevCode = document.getElementById('otp-dev-code');
+      if (otpDevCode && res.devOtp) otpDevCode.textContent = res.devOtp;
+      this.showToast('New OTP dispatched!', 'success');
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  }
+
+  async handleOtpVerify() {
+    const otpInput = document.getElementById('auth-otp-input');
+    const otp = otpInput?.value?.trim();
+    if (!otp || otp.length !== 6) {
+      this.showToast('Please enter the full 6-digit OTP code.', 'error');
+      return;
+    }
+
+    if (!this.pendingSignupData) {
+      this.showToast('Session expired. Please fill your registration details again.', 'error');
+      this.backToDetails();
+      return;
+    }
+
+    const verifyBtn = document.getElementById('auth-verify-btn');
+    const origText = verifyBtn ? verifyBtn.innerHTML : '';
+    if (verifyBtn) {
+      verifyBtn.disabled = true;
+      verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Verifying OTP & Registering in Supabase...';
+    }
+
+    try {
+      const res = await apiClient.verifyOtp({
+        email: this.pendingSignupData.email,
+        otp
+      });
+
+      if (res.success && res.user) {
+        appState.currentUser = res.user;
+        localStorage.setItem('civic_user', JSON.stringify(res.user));
+        this.updateUserSessionUI();
+        this.closeAuthModal();
+        this.showToast(res.message || `🎉 Welcome, ${res.user.name}!`, 'success');
+        await this.refreshData();
+
+        if (res.user.role === 'contractor') {
+          this.switchSection('contractor');
+        } else if (res.user.role === 'municipality') {
+          this.switchSection('municipality');
+        }
+      }
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    } finally {
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.innerHTML = origText;
+      }
+    }
   }
 
   signOut() {

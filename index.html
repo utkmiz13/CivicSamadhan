@@ -869,87 +869,102 @@
       </div>
 
       <form id="auth-form" class="space-y-3.5">
+        <!-- Step 1: User Details Form -->
+        <div id="auth-step-details" class="space-y-3.5">
+          <!-- Name (Sign up only) -->
+          <div class="auth-signup-only">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span
+                class="text-rose-500">*</span></label>
+            <input type="text" id="auth-name" placeholder="e.g. Aarav Sharma"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          </div>
 
-        <!-- Name (Sign up only) -->
-        <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span
-              class="text-rose-500">*</span></label>
-          <input type="text" id="auth-name" placeholder="e.g. Aarav Sharma"
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <!-- Email -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Email Address <span
+                class="text-rose-500">*</span></label>
+            <input type="email" id="auth-email" required placeholder="name@domain.com"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          </div>
+
+          <!-- Phone (Sign up only) -->
+          <div class="auth-signup-only">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number <span
+                class="text-rose-500">*</span></label>
+            <input type="tel" id="auth-phone" placeholder="+91 98765 43210"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          </div>
+
+          <!-- Role Select (Sign up only) -->
+          <div class="auth-signup-only">
+            <label class="block text-xs font-bold text-slate-700 mb-1">Register As <span
+                class="text-rose-500">*</span></label>
+            <select id="auth-role"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+              <option value="citizen">Citizen (नागरिक) - Report issues & earn rewards</option>
+              <option value="contractor">Contractor / Field Agency - Accept & resolve work orders</option>
+              <option value="municipality">Municipal Nodal Officer - Triage & allocate resources</option>
+            </select>
+          </div>
+
+          <!-- Password -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
+            <input type="password" id="auth-password" placeholder="••••••••"
+              class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          </div>
+
+          <!-- Submit Button -->
+          <button type="submit" id="auth-submit-btn"
+            class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-paper-plane"></i> Send Verification OTP (+100 Bonus Pts)
+          </button>
         </div>
 
-        <!-- Email -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Email Address <span
-              class="text-rose-500">*</span></label>
-          <input type="email" id="auth-email" required placeholder="name@domain.com"
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
-        </div>
+        <!-- Step 2: 6-Digit Email OTP Verification -->
+        <div id="auth-step-otp" class="hidden space-y-4 pt-1">
+          <div class="text-center space-y-1">
+            <div class="w-12 h-12 rounded-full bg-blue-50 text-gov-blue flex items-center justify-center text-xl mx-auto shadow-inner">
+              <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <h4 class="font-bold text-gov-navy text-sm">Enter 6-Digit Verification OTP</h4>
+            <p class="text-xs text-slate-500">
+              A one-time code has been sent to:
+            </p>
+            <p id="otp-target-email" class="text-xs font-mono font-bold text-gov-blue bg-blue-50 py-1 px-3 rounded inline-block border border-blue-200">
+              user@example.com
+            </p>
+          </div>
 
-        <!-- Phone (Sign up only) -->
-        <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number <span
-              class="text-rose-500">*</span></label>
-          <input type="tel" id="auth-phone" placeholder="+91 98765 43210"
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
-        </div>
+          <div class="space-y-1.5">
+            <label class="block text-[11px] font-bold text-slate-600 text-center uppercase tracking-wider">6-Digit OTP Code</label>
+            <input type="text" id="auth-otp-input" maxlength="6" pattern="[0-9]{6}" placeholder="• • • • • •"
+              class="w-full text-center font-mono text-2xl tracking-[0.4em] py-2.5 bg-slate-50 border-2 border-slate-300 focus:border-gov-blue rounded-xl font-bold text-gov-navy focus:outline-none focus:bg-white transition">
+          </div>
 
-        <!-- Role Select (Sign up only) -->
-        <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Register As <span
-              class="text-rose-500">*</span></label>
-          <select id="auth-role"
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
-            <option value="citizen">Citizen (नागरिक) - Report issues & earn rewards</option>
-            <option value="contractor">Contractor / Field Agency - Accept & resolve work orders</option>
-            <option value="municipality">Municipal Nodal Officer - Triage & allocate resources</option>
-          </select>
-        </div>
+          <!-- Dev / Demo Helper Badge -->
+          <div id="otp-dev-assist" class="hidden p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
+            <span class="text-emerald-800 font-medium text-[11px]"><i class="fa-solid fa-bolt mr-1"></i> Received OTP: <strong id="otp-dev-code" class="font-mono text-xs"></strong></span>
+            <button type="button" onclick="window.app.autofillOtp()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold shadow-sm">
+              Auto-Fill
+            </button>
+          </div>
 
-        <!-- Password -->
-        <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
-          <input type="password" id="auth-password" placeholder="••••••••"
-            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
-        </div>
+          <button type="button" id="auth-verify-btn" onclick="window.app.handleOtpVerify()"
+            class="w-full py-2.5 px-4 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs md:text-sm shadow-md transition flex items-center justify-center gap-2">
+            <i class="fa-solid fa-circle-check"></i> Verify OTP & Complete Registration
+          </button>
 
-        <!-- Submit Button -->
-        <button type="submit" id="auth-submit-btn"
-          class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition">
-          Create Account (+100 Bonus Pts)
-        </button>
+          <div class="flex items-center justify-between text-xs pt-1 border-t border-slate-100">
+            <button type="button" onclick="window.app.backToDetails()" class="text-slate-500 hover:text-slate-800 text-[11px] font-semibold flex items-center gap-1">
+              <i class="fa-solid fa-arrow-left"></i> Edit Details
+            </button>
+            <button type="button" id="otp-resend-btn" onclick="window.app.resendOtp()" class="text-gov-blue hover:text-gov-navy text-[11px] font-bold flex items-center gap-1">
+              <i class="fa-solid fa-rotate-right"></i> Resend OTP
+            </button>
+          </div>
+        </div>
       </form>
-    </div>
-  </div>
-
-  <!-- Modal: Email Confirmation Notice -->
-  <div id="confirm-email-modal"
-    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="w-full max-w-md bg-white border border-slate-300 rounded-2xl p-6 shadow-2xl space-y-4 text-center">
-      <div class="w-16 h-16 mx-auto rounded-full bg-blue-50 text-gov-blue flex items-center justify-center text-2xl shadow-inner">
-        <i class="fa-solid fa-envelope-circle-check"></i>
-      </div>
-      <div>
-        <h3 class="font-bold text-gov-navy text-lg">Verify Your Email Address</h3>
-        <p class="text-xs text-slate-600 mt-1">
-          A verification link has been dispatched to:
-        </p>
-        <p id="confirm-email-target" class="text-xs font-mono font-bold text-gov-blue bg-blue-50 py-1.5 px-3 rounded mt-2 break-all border border-blue-200">
-          user@example.com
-        </p>
-      </div>
-      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-900 text-left space-y-1">
-        <div class="font-bold flex items-center gap-1.5">
-          <i class="fa-solid fa-circle-info text-amber-600"></i> Next Step:
-        </div>
-        <p>1. Open your email inbox (and check the Spam/Promotions folder).</p>
-        <p>2. Click the confirmation link from Supabase.</p>
-        <p>3. Return here and Sign In to start reporting and redeeming rewards.</p>
-      </div>
-      <button onclick="window.app.closeEmailConfirmationModal()"
-        class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs shadow-md transition">
-        I Checked My Inbox — Proceed to Sign In
-      </button>
     </div>
   </div>
 

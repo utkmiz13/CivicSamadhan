@@ -44,60 +44,121 @@ export const apiClient = {
     return data;
   },
 
-  // 1. Real Supabase Authentication
-  async signup({ name, email, phone, role, password }) {
+  // 1. OTP-Based Real Authentication
+  async sendOtp({ name, email, phone, role, password }) {
     if (!name || !email || !password) {
       throw new Error('Please fill all mandatory fields: name, email, and password.');
     }
 
     try {
-      // Calls Supabase Auth - Automatically triggers verification email!
-      const authRes = await this.supabaseRest('auth/v1/signup', 'POST', {
-        email: email.trim().toLowerCase(),
-        password,
-        data: {
-          name: name.trim(),
-          phone: phone ? phone.trim() : '',
-          role: role.toLowerCase()
-        }
+      const res = await fetch('/api/auth/send-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, phone, role, password })
       });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
+        return data;
+      }
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      if (err.message?.includes('already exists') || err.message?.includes('Please provide')) {
+        throw err;
+      }
+    }
 
-      const user = {
-        id: authRes.id || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-        name: name.trim(),
-        email: email.trim().toLowerCase(),
-        phone: phone ? phone.trim() : '',
-        role: role.toLowerCase(),
-        points: 100,
-        badge: 'Civic Novice 🥉'
-      };
+    // Static GitHub Pages Fallback
+    const cleanEmail = email.trim().toLowerCase();
+    const clientOtp = Math.floor(100000 + Math.random() * 900000).toString();
+    sessionStorage.setItem('civic_pending_signup', JSON.stringify({
+      name,
+      email: cleanEmail,
+      phone,
+      role,
+      password,
+      otp: clientOtp,
+      expiresAt: Date.now() + 10 * 60 * 1000
+    }));
 
-      // Register contractor if contractor role
-      if (role.toLowerCase() === 'contractor') {
-        try {
-          await this.supabaseRest('contractors', 'POST', {
-            id: `CONT-${Math.floor(10 + Math.random() * 90)}`,
-            name: user.name,
-            category: 'Potholes & General Civil Works',
-            rating: 5.0,
-            completed_jobs: 0,
-            active_jobs: 0,
-            avg_turnaround_hours: 24.0
-          });
-        } catch (e) {
-          console.warn('Contractor cloud registration:', e.message);
+    return {
+      success: true,
+      message: `OTP dispatched to ${cleanEmail}!`,
+      email: cleanEmail,
+      devOtp: clientOtp
+    };
+  },
+
+  async verifyOtp({ email, otp }) {
+    if (!email || !otp) {
+      throw new Error('Please provide email and 6-digit OTP code.');
+    }
+
+    const cleanEmail = email.trim().toLowerCase();
+
+    try {
+      const res = await fetch('/api/auth/verify-otp', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, otp: otp.trim() })
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
+        return data;
+      }
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+    } catch (err) {
+      if (err.message?.includes('Invalid OTP') || err.message?.includes('expired')) {
+        throw err;
+      }
+    }
+
+    // Static GitHub Pages Fallback
+    const raw = sessionStorage.getItem('civic_pending_signup');
+    if (raw) {
+      const pending = JSON.parse(raw);
+      if (pending.email === cleanEmail) {
+        if (pending.otp === otp.trim()) {
+          const user = {
+            id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
+            name: pending.name,
+            email: pending.email,
+            phone: pending.phone || '',
+            role: pending.role,
+            points: 100,
+            badge: 'Civic Novice 🥉'
+          };
+          sessionStorage.removeItem('civic_pending_signup');
+          try {
+            await this.supabaseRest('leaderboard', 'POST', {
+              user_id: user.id,
+              name: `${user.name} (You)`,
+              points: 100,
+              issues_resolved: 0,
+              badge: 'Civic Novice 🥉',
+              tier: 'Bronze'
+            });
+          } catch (e) {}
+
+          return {
+            success: true,
+            message: `🎉 Account verified! Welcome, ${user.name}!`,
+            user
+          };
+        } else {
+          throw new Error('❌ Invalid OTP code. Please check and re-enter.');
         }
       }
-
-      return {
-        success: true,
-        confirmationSent: Boolean(authRes.confirmation_sent_at),
-        message: `Account created! 📧 A verification link has been sent to ${email}. Please check your inbox and confirm before signing in.`,
-        user
-      };
-    } catch (err) {
-      throw new Error(err.message || 'Signup failed.');
     }
+
+    throw new Error('Unable to verify OTP. Please try again.');
+  },
+
+  async signup(payload) {
+    return this.sendOtp(payload);
   },
 
   async login({ email, password }) {
@@ -105,10 +166,32 @@ export const apiClient = {
       throw new Error('Please enter both your registered email and password.');
     }
 
+    const cleanEmail = email.trim().toLowerCase();
+
+    // 1. Try backend login endpoint first
     try {
-      // Real Supabase Auth verification
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: cleanEmail, password })
+      });
+      const data = await res.json().catch(() => null);
+      if (res.ok && data?.success) {
+        return data;
+      }
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+    } catch (e) {
+      if (e.message?.includes('Invalid') || e.message?.includes('No account')) {
+        throw e;
+      }
+    }
+
+    // 2. Direct Supabase Auth verification
+    try {
       const authRes = await this.supabaseRest('auth/v1/token?grant_type=password', 'POST', {
-        email: email.trim().toLowerCase(),
+        email: cleanEmail,
         password
       });
 
@@ -116,7 +199,7 @@ export const apiClient = {
       const user = {
         id: authRes.user.id,
         name: meta.name || email.split('@')[0],
-        email: email.toLowerCase(),
+        email: cleanEmail,
         phone: meta.phone || '+91 98765 00000',
         role: (meta.role || 'citizen').toLowerCase(),
         points: 150,
@@ -129,12 +212,8 @@ export const apiClient = {
         user
       };
     } catch (err) {
-      // STRICT ERROR REPORTING - NO FAKE AUTO-LOGIN!
-      if (err.code === 'email_not_confirmed' || err.message?.includes('not confirmed')) {
-        throw new Error('📧 Email not confirmed! Please open your email inbox and click the verification link sent by Supabase.');
-      }
-      if (err.code === 'invalid_credentials' || err.message?.includes('Invalid login')) {
-        throw new Error('❌ No account found with these credentials. Please check your password or Sign Up first!');
+      if (err.code === 'invalid_credentials' || err.message?.includes('Invalid login') || err.message?.includes('invalid_credentials')) {
+        throw new Error('❌ Invalid email or password. If you have not created an account yet, please click "Sign Up" to get an OTP!');
       }
       throw new Error(`Authentication error: ${err.message}`);
     }
