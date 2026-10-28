@@ -146,6 +146,12 @@ export const citizenView = {
 
   async handleSubmit(event) {
     event.preventDefault();
+    if (!appState.currentUser) {
+      window.app.openAuthModal('signup');
+      window.app.showToast('Please sign in or create an account to lodge a civic grievance.', 'info');
+      return;
+    }
+
     const p = appState.presets[this.activePresetKey] || appState.presets.pothole;
     const title = document.getElementById('report-title')?.value || p.title;
     const category = document.getElementById('report-category')?.value || p.category;
@@ -159,6 +165,11 @@ export const citizenView = {
         address: p.address,
         lat: p.lat,
         lng: p.lng
+      },
+      reportedBy: {
+        userId: appState.currentUser.id,
+        name: appState.currentUser.name,
+        phone: appState.currentUser.phone
       }
     };
 
@@ -166,7 +177,11 @@ export const citizenView = {
       const response = await apiClient.createIssue(payload);
       if (response.success) {
         window.app.showToast(`🎉 Grievance registered under Docket #${response.data.id}! +15 Civic Tokens awarded.`, 'success');
-        appState.user.points += 15;
+        if (appState.currentUser) {
+          appState.currentUser.points += 15;
+          localStorage.setItem('civic_user', JSON.stringify(appState.currentUser));
+          window.app.updateUserSessionUI();
+        }
         await window.app.refreshData();
         window.app.switchSection('track');
       }

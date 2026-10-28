@@ -1,6 +1,5 @@
 /**
  * CivicSamadhan Master Application Controller
- * Modeled after e-Samadhan Centralized Grievance Portal (samadhaan.ugc.ac.in)
  */
 
 import { appState } from './state.js';
@@ -15,30 +14,32 @@ class ApplicationController {
     this.activeSection = 'home';
     this.currentFontSize = 14;
     this.activeVerifyIssueId = null;
+    this.authMode = 'signup'; // 'signup' or 'login'
   }
 
   async init() {
     this.setupEventListeners();
+    this.updateUserSessionUI();
+    this.renderGovPortals();
     await this.refreshData();
     this.switchSection('home');
   }
 
   setupEventListeners() {
-    // Navigation items
-    ['home', 'lodge', 'track', 'municipality', 'contractor', 'rewards'].forEach(sec => {
+    // Navigation
+    ['home', 'lodge', 'track', 'municipality', 'contractor', 'rewards', 'portals'].forEach(sec => {
       document.getElementById(`nav-${sec}`)?.addEventListener('click', () => this.switchSection(sec));
     });
 
-    // Preset selectors
+    // Demo presets
     ['pothole', 'garbage', 'wire', 'water'].forEach(key => {
       document.getElementById(`preset-${key}`)?.addEventListener('click', () => citizenView.applyPreset(key));
     });
 
-    // Grievance form
+    // Forms
     document.getElementById('citizen-report-form')?.addEventListener('submit', e => citizenView.handleSubmit(e));
-
-    // Municipality filter
     document.getElementById('municipality-filter')?.addEventListener('change', () => municipalityView.renderTable());
+    document.getElementById('auth-form')?.addEventListener('submit', e => this.handleAuthSubmit(e));
   }
 
   async refreshData() {
@@ -55,17 +56,197 @@ class ApplicationController {
       if (statsRes.success) appState.stats = statsRes.data;
       if (leaderboardRes.success) appState.leaderboard = leaderboardRes.data;
 
-      // Update citizen details
-      const user = appState.leaderboard.find(u => u.name.includes('Aarav') || u.userId === appState.user.id);
-      if (user) {
-        appState.user.points = user.points;
+      // Sync user points from leaderboard if exists
+      if (appState.currentUser) {
+        const userInBoard = appState.leaderboard.find(u => u.userId === appState.currentUser.id || u.name.includes(appState.currentUser.name));
+        if (userInBoard) {
+          appState.currentUser.points = userInBoard.points;
+          localStorage.setItem('civic_user', JSON.stringify(appState.currentUser));
+        }
       }
 
+      this.updateUserSessionUI();
       this.renderHomeStats();
       this.renderCurrentView();
     } catch (err) {
       console.error('[App] State refresh error:', err);
     }
+  }
+
+  // User Authentication
+  openAuthModal(mode = 'signup') {
+    this.authMode = mode;
+    const modal = document.getElementById('auth-modal');
+    const title = document.getElementById('auth-modal-title');
+    const sub = document.getElementById('auth-modal-subtitle');
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const signupFields = document.querySelectorAll('.auth-signup-only');
+
+    if (mode === 'signup') {
+      if (title) title.textContent = 'Create Citizen / Contractor Account';
+      if (sub) sub.textContent = 'Sign up to report civic issues, dispatch field teams, and earn redeemable points.';
+      if (submitBtn) submitBtn.textContent = 'Create Account (+100 Bonus Pts)';
+      signupFields.forEach(el => el.classList.remove('hidden'));
+    } else {
+      if (title) title.textContent = 'Sign In to CivicSamadhan';
+      if (sub) sub.textContent = 'Enter your registered email address to access your civic wallet and tasks.';
+      if (submitBtn) submitBtn.textContent = 'Sign In';
+      signupFields.forEach(el => el.classList.add('hidden'));
+    }
+
+    modal?.classList.remove('hidden');
+  }
+
+  closeAuthModal() {
+    document.getElementById('auth-modal')?.classList.add('hidden');
+  }
+
+  async handleAuthSubmit(e) {
+    e.preventDefault();
+    const name = document.getElementById('auth-name')?.value;
+    const email = document.getElementById('auth-email')?.value;
+    const phone = document.getElementById('auth-phone')?.value;
+    const role = document.getElementById('auth-role')?.value || 'citizen';
+    const password = document.getElementById('auth-password')?.value;
+
+    try {
+      let res;
+      if (this.authMode === 'signup') {
+        res = await apiClient.signup({ name, email, phone, role, password });
+      } else {
+        res = await apiClient.login({ email, password });
+      }
+
+      if (res.success && res.user) {
+        appState.currentUser = res.user;
+        localStorage.setItem('civic_user', JSON.stringify(res.user));
+        this.updateUserSessionUI();
+        this.closeAuthModal();
+        this.showToast(res.message, 'success');
+        await this.refreshData();
+
+        // Direct user based on role
+        if (res.user.role === 'contractor') {
+          this.switchSection('contractor');
+        } else if (res.user.role === 'municipality') {
+          this.switchSection('municipality');
+        }
+      }
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  }
+
+  signOut() {
+    appState.currentUser = null;
+    localStorage.removeItem('civic_user');
+    this.updateUserSessionUI();
+    this.showToast('Signed out successfully.', 'info');
+    this.switchSection('home');
+  }
+
+  updateUserSessionUI() {
+    const authActions = document.getElementById('header-auth-actions');
+    const userChip = document.getElementById('header-user-chip');
+    const userName = document.getElementById('header-user-name');
+    const userPoints = document.getElementById('header-user-points');
+    const userRole = document.getElementById('header-user-role');
+
+    if (!authActions || !userChip) return;
+
+    if (appState.currentUser) {
+      authActions.classList.add('hidden');
+      userChip.classList.remove('hidden');
+      if (userName) userName.textContent = appState.currentUser.name;
+      if (userPoints) userPoints.textContent = `${appState.currentUser.points} Pts`;
+      if (userRole) userRole.textContent = appState.currentUser.role.toUpperCase();
+    } else {
+      authActions.classList.remove('hidden');
+      userChip.classList.add('hidden');
+    }
+
+    // Update mini-cards across views
+    const citizenPts = document.getElementById('citizen-points');
+    const citizenName = document.getElementById('citizen-name');
+    if (citizenPts && appState.currentUser) citizenPts.textContent = appState.currentUser.points;
+    if (citizenName && appState.currentUser) citizenName.textContent = appState.currentUser.name;
+  }
+
+  // Redeem Reward Action
+  async redeemPerkAction(perkTitle, pointsCost) {
+    if (!appState.currentUser) {
+      this.openAuthModal('signup');
+      this.showToast('Please sign in or create an account to redeem rewards.', 'info');
+      return;
+    }
+
+    if (appState.currentUser.points < pointsCost) {
+      this.showToast(`Insufficient points! You need ${pointsCost - appState.currentUser.points} more points.`, 'error');
+      return;
+    }
+
+    try {
+      const res = await apiClient.redeemPerk({
+        userId: appState.currentUser.id,
+        perkTitle,
+        pointsCost
+      });
+
+      if (res.success) {
+        appState.currentUser.points = res.remainingPoints;
+        localStorage.setItem('civic_user', JSON.stringify(appState.currentUser));
+
+        appState.claimedVouchers.unshift({
+          title: perkTitle,
+          code: res.voucherCode,
+          date: new Date().toLocaleDateString(),
+          points: pointsCost
+        });
+
+        this.updateUserSessionUI();
+        rewardsView.render();
+        this.showToast(`🎉 Success! Voucher code: ${res.voucherCode}`, 'success');
+      }
+    } catch (err) {
+      this.showToast(err.message, 'error');
+    }
+  }
+
+  // Government Portals Grid
+  renderGovPortals() {
+    const container = document.getElementById('gov-portals-grid');
+    if (!container) return;
+
+    container.innerHTML = '';
+    appState.govPortals.forEach(portal => {
+      const card = document.createElement('div');
+      card.className = 'p-5 rounded-xl bg-white border border-gov-border shadow-sm hover:shadow-md transition flex flex-col justify-between space-y-3';
+
+      card.innerHTML = `
+        <div class="space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="w-10 h-10 rounded-lg bg-blue-50 text-gov-blue flex items-center justify-center text-lg">
+              <i class="fa-solid ${portal.icon}"></i>
+            </span>
+            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-gov-ash text-slate-700 border border-slate-300">
+              ${portal.badge}
+            </span>
+          </div>
+          <div>
+            <h4 class="font-bold text-slate-900 text-sm">${portal.name}</h4>
+            <p class="text-xs font-semibold text-gov-blue">${portal.title}</p>
+          </div>
+          <p class="text-[11px] text-slate-500 leading-relaxed">${portal.ministry}</p>
+        </div>
+
+        <a href="${portal.url}" target="_blank" rel="noopener noreferrer" class="w-full py-2 px-3 rounded-lg bg-gov-ash hover:bg-slate-200 text-slate-800 font-bold text-xs transition flex items-center justify-center gap-1.5 border border-slate-300">
+          <span>Visit Official Portal</span>
+          <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i>
+        </a>
+      `;
+
+      container.appendChild(card);
+    });
   }
 
   renderHomeStats() {
@@ -86,7 +267,6 @@ class ApplicationController {
   switchSection(section) {
     this.activeSection = section;
 
-    // Update navigation active states
     document.querySelectorAll('.nav-item').forEach(btn => {
       btn.classList.remove('active', 'bg-gov-navy', 'border-gov-saffron');
       btn.classList.add('border-transparent');
@@ -98,7 +278,6 @@ class ApplicationController {
       activeNav.classList.remove('border-transparent');
     }
 
-    // Toggle pages
     document.querySelectorAll('.page-section').forEach(sec => {
       sec.classList.add('hidden');
       sec.classList.remove('block');
@@ -134,10 +313,12 @@ class ApplicationController {
       case 'rewards':
         rewardsView.render();
         break;
+      case 'portals':
+        this.renderGovPortals();
+        break;
     }
   }
 
-  // Accessibility Font Sizer
   adjustFontSize(delta) {
     if (delta === 0) {
       this.currentFontSize = 14;
@@ -167,7 +348,7 @@ class ApplicationController {
       container.innerHTML = `
         <div class="p-6 text-center text-slate-500 bg-slate-50 rounded-lg border border-slate-200">
           <p class="font-bold text-sm">No Grievance Found with Docket ID "${input}"</p>
-          <p class="text-xs text-slate-400 mt-1">Please verify the reference docket number and retry.</p>
+          <p class="text-xs text-slate-400 mt-1">Please verify the docket reference number and retry.</p>
         </div>
       `;
       return;
@@ -176,7 +357,6 @@ class ApplicationController {
     citizenView.renderSpecificList(filtered);
   }
 
-  // Modals
   openAssignModal(issueId) {
     municipalityView.openAssignModal(issueId);
   }
@@ -229,10 +409,6 @@ class ApplicationController {
     }
   }
 
-  claimReward(title) {
-    rewardsView.claimPerk(title);
-  }
-
   async resetDemoData() {
     try {
       const res = await apiClient.resetDatabase();
@@ -261,8 +437,8 @@ class ApplicationController {
     setTimeout(() => toast.classList.remove('translate-y-4', 'opacity-0'), 10);
     setTimeout(() => {
       toast.classList.add('opacity-0', 'translate-y-2');
-      setTimeout(() => toast.remove(), 300);
-    }, 4000);
+      setTimeout(() => toast.remove(), 3500);
+    }, 3800);
   }
 }
 

@@ -6,16 +6,14 @@
 const issueController = require('../controllers/issueController');
 const statsController = require('../controllers/statsController');
 const authController = require('../controllers/authController');
-const { authorizeRoles, ROLES } = require('../middleware/rbac');
 
-// Route table definition
 const routes = [
   // Issue Endpoints
   { method: 'GET', path: '/api/issues', handler: issueController.getIssues },
-  { method: 'POST', path: '/api/issues', middleware: authorizeRoles(ROLES.CITIZEN, ROLES.ADMIN), handler: issueController.createIssue },
-  { method: 'POST', path: '/api/issues/:issueId/assign', middleware: authorizeRoles(ROLES.MUNICIPALITY, ROLES.ADMIN), handler: issueController.assignContractor },
-  { method: 'POST', path: '/api/issues/:issueId/resolve', middleware: authorizeRoles(ROLES.CONTRACTOR, ROLES.ADMIN), handler: issueController.submitResolution },
-  { method: 'POST', path: '/api/issues/:issueId/verify', middleware: authorizeRoles(ROLES.CITIZEN, ROLES.ADMIN), handler: issueController.verifyResolution },
+  { method: 'POST', path: '/api/issues', handler: issueController.createIssue },
+  { method: 'POST', path: '/api/issues/:issueId/assign', handler: issueController.assignContractor },
+  { method: 'POST', path: '/api/issues/:issueId/resolve', handler: issueController.submitResolution },
+  { method: 'POST', path: '/api/issues/:issueId/verify', handler: issueController.verifyResolution },
 
   // Analytics & Reference Endpoints
   { method: 'GET', path: '/api/stats', handler: statsController.getCityStats },
@@ -24,8 +22,9 @@ const routes = [
   { method: 'POST', path: '/api/reset', handler: statsController.resetData },
 
   // Auth & Session
-  { method: 'POST', path: '/api/auth/profile', handler: authController.switchProfile }
+  { method: 'POST', path: '/api/auth/signup', handler: authController.signup },
+  { method: 'POST', path: '/api/auth/login', handler: authController.login },
+  { method: 'POST', path: '/api/rewards/redeem', handler: authController.redeemVoucher }
 ];
 
 module.exports = routes;
-
