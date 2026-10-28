@@ -81,17 +81,31 @@ class ApplicationController {
     const sub = document.getElementById('auth-modal-subtitle');
     const submitBtn = document.getElementById('auth-submit-btn');
     const signupFields = document.querySelectorAll('.auth-signup-only');
+    const tabSignup = document.getElementById('auth-tab-signup');
+    const tabLogin = document.getElementById('auth-tab-login');
 
     if (mode === 'signup') {
       if (title) title.textContent = 'Create Citizen / Contractor Account';
       if (sub) sub.textContent = 'Sign up to report civic issues, dispatch field teams, and earn redeemable points.';
       if (submitBtn) submitBtn.textContent = 'Create Account (+100 Bonus Pts)';
       signupFields.forEach(el => el.classList.remove('hidden'));
+      if (tabSignup) {
+        tabSignup.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-gov-blue text-gov-blue transition';
+      }
+      if (tabLogin) {
+        tabLogin.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-gov-blue transition';
+      }
     } else {
       if (title) title.textContent = 'Sign In to CivicSamadhan';
       if (sub) sub.textContent = 'Enter your registered email address to access your civic wallet and tasks.';
       if (submitBtn) submitBtn.textContent = 'Sign In';
       signupFields.forEach(el => el.classList.add('hidden'));
+      if (tabLogin) {
+        tabLogin.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-gov-blue text-gov-blue transition';
+      }
+      if (tabSignup) {
+        tabSignup.className = 'flex-1 py-2 text-center text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-gov-blue transition';
+      }
     }
 
     modal?.classList.remove('hidden');
@@ -103,38 +117,68 @@ class ApplicationController {
 
   async handleAuthSubmit(e) {
     e.preventDefault();
-    const name = document.getElementById('auth-name')?.value;
-    const email = document.getElementById('auth-email')?.value;
-    const phone = document.getElementById('auth-phone')?.value;
+    const name = document.getElementById('auth-name')?.value?.trim();
+    const email = document.getElementById('auth-email')?.value?.trim();
+    const phone = document.getElementById('auth-phone')?.value?.trim();
     const role = document.getElementById('auth-role')?.value || 'citizen';
     const password = document.getElementById('auth-password')?.value;
 
+    const submitBtn = document.getElementById('auth-submit-btn');
+    const originalText = submitBtn ? submitBtn.innerHTML : '';
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1"></i> Processing...';
+    }
+
     try {
-      let res;
       if (this.authMode === 'signup') {
-        res = await apiClient.signup({ name, email, phone, role, password });
-      } else {
-        res = await apiClient.login({ email, password });
-      }
-
-      if (res.success && res.user) {
-        appState.currentUser = res.user;
-        localStorage.setItem('civic_user', JSON.stringify(res.user));
-        this.updateUserSessionUI();
+        const res = await apiClient.signup({ name, email, phone, role, password });
+        // DO NOT log in automatically before confirmation!
         this.closeAuthModal();
-        this.showToast(res.message, 'success');
-        await this.refreshData();
+        this.showEmailConfirmationNotice(email);
+      } else {
+        const res = await apiClient.login({ email, password });
+        if (res.success && res.user) {
+          appState.currentUser = res.user;
+          localStorage.setItem('civic_user', JSON.stringify(res.user));
+          this.updateUserSessionUI();
+          this.closeAuthModal();
+          this.showToast(res.message || `Welcome back, ${res.user.name}!`, 'success');
+          await this.refreshData();
 
-        // Direct user based on role
-        if (res.user.role === 'contractor') {
-          this.switchSection('contractor');
-        } else if (res.user.role === 'municipality') {
-          this.switchSection('municipality');
+          // Direct user based on role
+          if (res.user.role === 'contractor') {
+            this.switchSection('contractor');
+          } else if (res.user.role === 'municipality') {
+            this.switchSection('municipality');
+          }
         }
       }
     } catch (err) {
       this.showToast(err.message, 'error');
+    } finally {
+      if (submitBtn) {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = originalText;
+      }
     }
+  }
+
+  showEmailConfirmationNotice(email) {
+    const modal = document.getElementById('confirm-email-modal');
+    const emailTarget = document.getElementById('confirm-email-target');
+    if (emailTarget) emailTarget.textContent = email;
+    if (modal) {
+      modal.classList.remove('hidden');
+    } else {
+      this.showToast(`📧 Verification email sent to ${email}! Please verify before signing in.`, 'info');
+      this.openAuthModal('login');
+    }
+  }
+
+  closeEmailConfirmationModal() {
+    document.getElementById('confirm-email-modal')?.classList.add('hidden');
+    this.openAuthModal('login');
   }
 
   signOut() {

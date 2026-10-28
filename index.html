@@ -1,20 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CivicSamadhan | Centralized Civic Grievance & Urban Redressal Platform</title>
-  
+
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  
+
   <!-- FontAwesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  
+
   <!-- Google Fonts: Inter for UI & Noto Sans Devanagari for Hindi subtitles -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap"
+    rel="stylesheet">
 
   <!-- Leaflet Map CSS & JS -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
@@ -45,6 +48,7 @@
   </script>
   <link rel="stylesheet" href="src/css/style.css">
 </head>
+
 <body class="bg-gov-ash text-slate-800 min-h-screen font-sans antialiased flex flex-col">
 
   <!-- ======================================================== -->
@@ -55,7 +59,8 @@
       <div class="flex items-center gap-3">
         <span class="font-medium text-slate-200">भारत सरकार | Government of India</span>
         <span class="hidden md:inline text-slate-400">•</span>
-        <span class="hidden md:inline text-slate-300">आवास एवं शहरी कार्य मंत्रालय | Ministry of Housing & Urban Affairs</span>
+        <span class="hidden md:inline text-slate-300">आवास एवं शहरी कार्य मंत्रालय | Ministry of Housing & Urban
+          Affairs</span>
       </div>
       <div class="flex items-center gap-4 text-[11px]">
         <div class="hidden sm:flex items-center gap-1.5 text-slate-300">
@@ -63,9 +68,12 @@
           <span>Toll-Free Helpline: <strong>1800-11-2026</strong></span>
         </div>
         <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
-          <button onclick="window.app.adjustFontSize(-1)" class="hover:text-gov-saffron font-bold px-1" title="Decrease font">A-</button>
-          <button onclick="window.app.adjustFontSize(0)" class="hover:text-gov-saffron font-bold px-1" title="Default font">A</button>
-          <button onclick="window.app.adjustFontSize(1)" class="hover:text-gov-saffron font-bold px-1" title="Increase font">A+</button>
+          <button onclick="window.app.adjustFontSize(-1)" class="hover:text-gov-saffron font-bold px-1"
+            title="Decrease font">A-</button>
+          <button onclick="window.app.adjustFontSize(0)" class="hover:text-gov-saffron font-bold px-1"
+            title="Default font">A</button>
+          <button onclick="window.app.adjustFontSize(1)" class="hover:text-gov-saffron font-bold px-1"
+            title="Increase font">A+</button>
         </div>
       </div>
     </div>
@@ -83,10 +91,11 @@
   <!-- ======================================================== -->
   <header class="bg-white border-b border-gov-border shadow-sm">
     <div class="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
-      
+
       <!-- Brand Logo & Title -->
       <div class="flex items-center gap-3 cursor-pointer" onclick="window.app.switchSection('home')">
-        <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-gov-navy to-gov-blue flex items-center justify-center text-white text-xl shadow-md">
+        <div
+          class="w-11 h-11 rounded-xl bg-gradient-to-tr from-gov-navy to-gov-blue flex items-center justify-center text-white text-xl shadow-md">
           <i class="fa-solid fa-city text-gov-saffron"></i>
         </div>
         <div>
@@ -94,7 +103,8 @@
             <h1 class="text-xl md:text-2xl font-black tracking-tight text-gov-navy">
               Civic<span class="text-gov-saffron">Samadhan</span>
             </h1>
-            <span class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-gov-blue border border-blue-200">
+            <span
+              class="hidden sm:inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-gov-blue border border-blue-200">
               NATIONAL PLATFORM
             </span>
           </div>
@@ -106,21 +116,25 @@
 
       <!-- User Auth Section -->
       <div class="flex items-center gap-3">
-        
+
         <!-- Logged-Out Actions -->
         <div id="header-auth-actions" class="flex items-center gap-2">
-          <button onclick="window.app.openAuthModal('login')" class="px-3.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 transition">
+          <button onclick="window.app.openAuthModal('login')"
+            class="px-3.5 py-1.5 rounded-lg border border-slate-300 hover:bg-slate-50 text-xs font-bold text-slate-700 transition">
             Sign In
           </button>
-          <button onclick="window.app.openAuthModal('signup')" class="px-4 py-1.5 rounded-lg bg-gov-blue hover:bg-gov-navy text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
+          <button onclick="window.app.openAuthModal('signup')"
+            class="px-4 py-1.5 rounded-lg bg-gov-blue hover:bg-gov-navy text-white text-xs font-bold shadow-sm transition flex items-center gap-1.5">
             <i class="fa-solid fa-user-plus"></i> Sign Up
           </button>
         </div>
 
         <!-- Logged-In User Profile Chip -->
-        <div id="header-user-chip" class="hidden flex items-center gap-3 bg-gov-ash border border-slate-300 rounded-xl px-3 py-1.5 shadow-inner">
+        <div id="header-user-chip"
+          class="hidden flex items-center gap-3 bg-gov-ash border border-slate-300 rounded-xl px-3 py-1.5 shadow-inner">
           <div class="flex items-center gap-2">
-            <div class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center text-xs font-bold shadow-sm">
+            <div
+              class="w-8 h-8 rounded-full bg-gov-blue text-white flex items-center justify-center text-xs font-bold shadow-sm">
               <i class="fa-solid fa-user"></i>
             </div>
             <div>
@@ -128,11 +142,13 @@
               <div class="flex items-center gap-1 mt-0.5">
                 <span class="text-[10px] font-bold text-gov-blue" id="header-user-role">CITIZEN</span>
                 <span class="text-[10px] text-slate-400">•</span>
-                <span class="text-[10px] font-mono font-bold text-amber-700 bg-amber-100 px-1 rounded" id="header-user-points">540 Pts</span>
+                <span class="text-[10px] font-mono font-bold text-amber-700 bg-amber-100 px-1 rounded"
+                  id="header-user-points">540 Pts</span>
               </div>
             </div>
           </div>
-          <button onclick="window.app.signOut()" title="Sign Out" class="text-slate-400 hover:text-rose-600 pl-2 border-l border-slate-300 text-xs transition">
+          <button onclick="window.app.signOut()" title="Sign Out"
+            class="text-slate-400 hover:text-rose-600 pl-2 border-l border-slate-300 text-xs transition">
             <i class="fa-solid fa-arrow-right-from-bracket"></i>
           </button>
         </div>
@@ -148,32 +164,40 @@
   <nav class="bg-gov-blue border-b-2 border-gov-saffron text-white sticky top-0 z-40 shadow-md">
     <div class="max-w-7xl mx-auto px-4 flex items-center justify-between overflow-x-auto custom-scrollbar">
       <div class="flex items-center whitespace-nowrap">
-        <button id="nav-home" class="nav-item active px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-gov-saffron bg-gov-navy">
+        <button id="nav-home"
+          class="nav-item active px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-gov-saffron bg-gov-navy">
           <i class="fa-solid fa-house"></i> Home
         </button>
-        <button id="nav-lodge" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-lodge"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-pen-to-square"></i> Lodge Grievance
         </button>
-        <button id="nav-track" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-track"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-magnifying-glass-location"></i> Track Status
         </button>
-        <button id="nav-municipality" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-municipality"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-building-columns"></i> Municipal Admin
         </button>
-        <button id="nav-contractor" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-contractor"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-helmet-safety"></i> Contractor Desk
         </button>
-        <button id="nav-rewards" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-rewards"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-gift text-gov-saffron"></i> Rewards Store & Points
         </button>
-        <button id="nav-portals" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+        <button id="nav-portals"
+          class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
           <i class="fa-solid fa-landmark-dome"></i> Govt Portals
         </button>
       </div>
 
       <!-- Quick Reset Demo Button -->
       <div class="hidden sm:flex items-center pl-4">
-        <button onclick="window.app.resetDemoData()" title="Reset Seed State" class="px-2.5 py-1 text-xs font-semibold bg-white/10 hover:bg-white/20 rounded border border-white/20 transition flex items-center gap-1.5 text-slate-200">
+        <button onclick="window.app.resetDemoData()" title="Reset Seed State"
+          class="px-2.5 py-1 text-xs font-semibold bg-white/10 hover:bg-white/20 rounded border border-white/20 transition flex items-center gap-1.5 text-slate-200">
           <i class="fa-solid fa-rotate-left"></i> Reset Seed
         </button>
       </div>
@@ -192,25 +216,31 @@
     <!-- VIEW A: HOME DASHBOARD                               -->
     <!-- ==================================================== -->
     <section id="section-home" class="page-section block space-y-6">
-      
+
       <!-- Modern Hero Banner -->
-      <div class="rounded-2xl overflow-hidden bg-gradient-to-r from-gov-navy via-gov-blue to-gov-lightBlue text-white shadow-xl relative border border-gov-blue/50">
+      <div
+        class="rounded-2xl overflow-hidden bg-gradient-to-r from-gov-navy via-gov-blue to-gov-lightBlue text-white shadow-xl relative border border-gov-blue/50">
         <div class="p-6 md:p-10 relative z-10 max-w-3xl space-y-3">
-          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-gov-saffron">
+          <div
+            class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-gov-saffron">
             <i class="fa-solid fa-shield-halved"></i> 24x7 Civic Redressal & Rewards Engine
           </div>
           <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight leading-tight">
             Next-Gen Urban Civic Grievance Monitoring & Resolution
           </h2>
           <p class="text-sm md:text-base text-slate-200 leading-relaxed">
-            Report potholes, garbage accumulation, water leakages, and broken streetlights. Powered by <strong class="text-gov-saffron">AI Computer Vision</strong> for automatic defect classification, spatial geofencing, and verifiable <strong class="text-emerald-400">citizen reward points</strong>.
+            Report potholes, garbage accumulation, water leakages, and broken streetlights. Powered by <strong
+              class="text-gov-saffron">AI Computer Vision</strong> for automatic defect classification, spatial
+            geofencing, and verifiable <strong class="text-emerald-400">citizen reward points</strong>.
           </p>
 
           <div class="pt-3 flex flex-wrap items-center gap-3">
-            <button onclick="window.app.switchSection('lodge')" class="px-5 py-2.5 rounded-lg bg-gov-saffron hover:bg-amber-500 text-gov-navy font-bold text-xs md:text-sm shadow-md transition flex items-center gap-2">
+            <button onclick="window.app.switchSection('lodge')"
+              class="px-5 py-2.5 rounded-lg bg-gov-saffron hover:bg-amber-500 text-gov-navy font-bold text-xs md:text-sm shadow-md transition flex items-center gap-2">
               <i class="fa-solid fa-camera"></i> Report an Issue & Earn Points
             </button>
-            <button onclick="window.app.switchSection('rewards')" class="px-5 py-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-semibold text-xs md:text-sm border border-white/30 transition flex items-center gap-2">
+            <button onclick="window.app.switchSection('rewards')"
+              class="px-5 py-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-semibold text-xs md:text-sm border border-white/30 transition flex items-center gap-2">
               <i class="fa-solid fa-gift"></i> Browse Rewards Store
             </button>
           </div>
@@ -223,11 +253,13 @@
 
       <!-- Core Workflow Grid -->
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        
+
         <!-- Card 1: Lodge Grievance -->
-        <div onclick="window.app.switchSection('lodge')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+        <div onclick="window.app.switchSection('lodge')"
+          class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-blue-50 text-gov-blue flex items-center justify-center text-xl mb-3 group-hover:bg-gov-blue group-hover:text-white transition">
+            <div
+              class="w-12 h-12 rounded-xl bg-blue-50 text-gov-blue flex items-center justify-center text-xl mb-3 group-hover:bg-gov-blue group-hover:text-white transition">
               <i class="fa-solid fa-pen-to-square"></i>
             </div>
             <h3 class="font-bold text-base text-gov-navy mb-1">Lodge Grievance</h3>
@@ -235,16 +267,19 @@
               Capture photo of pothole, garbage, or wire. AI classifies severity and locks GPS coordinates instantly.
             </p>
           </div>
-          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+          <div
+            class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
             <span>Report Defect</span>
             <i class="fa-solid fa-arrow-right"></i>
           </div>
         </div>
 
         <!-- Card 2: Track Status -->
-        <div onclick="window.app.switchSection('track')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+        <div onclick="window.app.switchSection('track')"
+          class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-amber-50 text-gov-saffron flex items-center justify-center text-xl mb-3 group-hover:bg-gov-saffron group-hover:text-white transition">
+            <div
+              class="w-12 h-12 rounded-xl bg-amber-50 text-gov-saffron flex items-center justify-center text-xl mb-3 group-hover:bg-gov-saffron group-hover:text-white transition">
               <i class="fa-solid fa-magnifying-glass-location"></i>
             </div>
             <h3 class="font-bold text-base text-gov-navy mb-1">Track Grievance</h3>
@@ -252,16 +287,19 @@
               Track your docket in real-time. Verify the contractor's repair proof photo before payout release.
             </p>
           </div>
-          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+          <div
+            class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
             <span>Check Docket Status</span>
             <i class="fa-solid fa-arrow-right"></i>
           </div>
         </div>
 
         <!-- Card 3: Municipal Admin -->
-        <div onclick="window.app.switchSection('municipality')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+        <div onclick="window.app.switchSection('municipality')"
+          class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl mb-3 group-hover:bg-purple-700 group-hover:text-white transition">
+            <div
+              class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl mb-3 group-hover:bg-purple-700 group-hover:text-white transition">
               <i class="fa-solid fa-building-columns"></i>
             </div>
             <h3 class="font-bold text-base text-gov-navy mb-1">Municipal Admin</h3>
@@ -269,16 +307,19 @@
               GIS spatial heatmaps, SLA escalation countdowns, and contractor dispatch workflows.
             </p>
           </div>
-          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+          <div
+            class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
             <span>Command Center</span>
             <i class="fa-solid fa-arrow-right"></i>
           </div>
         </div>
 
         <!-- Card 4: Rewards Store -->
-        <div onclick="window.app.switchSection('rewards')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+        <div onclick="window.app.switchSection('rewards')"
+          class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
           <div>
-            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-3 group-hover:bg-emerald-700 group-hover:text-white transition">
+            <div
+              class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-3 group-hover:bg-emerald-700 group-hover:text-white transition">
               <i class="fa-solid fa-gift"></i>
             </div>
             <h3 class="font-bold text-base text-gov-navy mb-1">Redeem Points</h3>
@@ -286,7 +327,8 @@
               Redeem civic points for Metro recharges, Smart Parking passes, and Property Tax rebates.
             </p>
           </div>
-          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+          <div
+            class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
             <span>Browse Rewards</span>
             <i class="fa-solid fa-arrow-right"></i>
           </div>
@@ -303,7 +345,8 @@
             </h3>
             <p class="text-xs text-slate-500">Live operational telemetry across municipal zones</p>
           </div>
-          <span class="inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+          <span
+            class="inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
             <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mr-1.5"></span> Live Sync
           </span>
         </div>
@@ -338,13 +381,14 @@
     <!-- VIEW B: LODGE CIVIC GRIEVANCE                        -->
     <!-- ==================================================== -->
     <section id="section-lodge" class="page-section hidden space-y-6">
-      
+
       <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex items-center justify-between">
         <div>
           <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
             <i class="fa-solid fa-pen-to-square text-gov-blue"></i> Lodge Civic Grievance / नागरिक शिकायत दर्ज करें
           </h2>
-          <p class="text-xs text-slate-500">Report a problem in your neighborhood. AI Vision extracts defect severity & GPS coordinates.</p>
+          <p class="text-xs text-slate-500">Report a problem in your neighborhood. AI Vision extracts defect severity &
+            GPS coordinates.</p>
         </div>
         <span class="text-xs font-bold text-gov-saffron bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
           +15 to +40 Civic Points
@@ -352,26 +396,31 @@
       </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
-        
+
         <!-- Form Left Column -->
         <div class="lg:col-span-7 bg-white rounded-xl p-6 border border-gov-border shadow-sm space-y-4">
-          
+
           <!-- Test Scenarios Presets -->
           <div>
             <label class="block text-xs font-bold text-slate-700 mb-1.5">
-              <i class="fa-solid fa-wand-magic-sparkles text-gov-saffron mr-1"></i> Quick Presets (Click to Auto-Populate):
+              <i class="fa-solid fa-wand-magic-sparkles text-gov-saffron mr-1"></i> Quick Presets (Click to
+              Auto-Populate):
             </label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <button type="button" id="preset-pothole" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+              <button type="button" id="preset-pothole"
+                class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
                 <span>🕳️</span> Pothole
               </button>
-              <button type="button" id="preset-garbage" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+              <button type="button" id="preset-garbage"
+                class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
                 <span>🗑️</span> Waste Dump
               </button>
-              <button type="button" id="preset-wire" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+              <button type="button" id="preset-wire"
+                class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
                 <span>⚡</span> Dangling Cable
               </button>
-              <button type="button" id="preset-water" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+              <button type="button" id="preset-water"
+                class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
                 <span>💧</span> Water Leak
               </button>
             </div>
@@ -379,15 +428,19 @@
 
           <!-- Grievance Form -->
           <form id="citizen-report-form" class="space-y-4">
-            
+
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Grievance Headline <span class="text-rose-500">*</span></label>
-              <input type="text" id="report-title" required placeholder="Describe the civic issue" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white transition">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Grievance Headline <span
+                  class="text-rose-500">*</span></label>
+              <input type="text" id="report-title" required placeholder="Describe the civic issue"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white transition">
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Civic Category <span class="text-rose-500">*</span></label>
-              <select id="report-category" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Civic Category <span
+                  class="text-rose-500">*</span></label>
+              <select id="report-category"
+                class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white">
                 <option value="Potholes & Roads">Potholes & Damaged Road Surface (सड़क एवं गड्ढे)</option>
                 <option value="Sanitation & Waste">Garbage Accumulation & Waste Dump (कूड़ा एवं स्वच्छता)</option>
                 <option value="Electrical & Lighting">Street Lights & Exposed Cables (स्ट्रीट लाइट एवं बिजली)</option>
@@ -396,17 +449,22 @@
             </div>
 
             <div>
-              <label class="block text-xs font-bold text-slate-700 mb-1">Geotagged Location (GPS Verified) <span class="text-rose-500">*</span></label>
-              <div class="p-2.5 rounded-lg bg-gov-ash border border-slate-200 flex items-center justify-between text-xs">
+              <label class="block text-xs font-bold text-slate-700 mb-1">Geotagged Location (GPS Verified) <span
+                  class="text-rose-500">*</span></label>
+              <div
+                class="p-2.5 rounded-lg bg-gov-ash border border-slate-200 flex items-center justify-between text-xs">
                 <div class="flex items-center gap-2 truncate">
                   <i class="fa-solid fa-location-dot text-rose-600"></i>
-                  <span id="report-location-text" class="text-slate-700 text-xs truncate">Near Metro Pillar 142, Outer Ring Road, New Delhi</span>
+                  <span id="report-location-text" class="text-slate-700 text-xs truncate">Near Metro Pillar 142, Outer
+                    Ring Road, New Delhi</span>
                 </div>
-                <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">GPS LOCKED</span>
+                <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">GPS
+                  LOCKED</span>
               </div>
             </div>
 
-            <button type="submit" id="submit-btn" class="w-full py-3 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition flex items-center justify-center gap-2">
+            <button type="submit" id="submit-btn"
+              class="w-full py-3 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition flex items-center justify-center gap-2">
               <i class="fa-solid fa-paper-plane"></i> Submit Grievance & Claim Points
             </button>
           </form>
@@ -418,23 +476,51 @@
           <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm space-y-3">
             <h3 class="text-xs font-bold text-gov-navy uppercase tracking-wider flex items-center justify-between">
               <span>Evidence Photographic Capture</span>
-              <span class="text-[10px] text-gov-saffron font-bold">AI Scanner Active</span>
+              <span class="text-[10px] text-gov-saffron font-bold flex items-center gap-1">
+                <i class="fa-solid fa-satellite-dish animate-pulse"></i> AI Scanner Ready
+              </span>
             </h3>
 
-            <div class="relative rounded-lg overflow-hidden border border-slate-200">
-              <img id="photo-preview" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800" alt="Evidence" class="w-full h-44 object-cover">
-              <div class="absolute top-2 left-2 px-2 py-0.5 bg-black/60 backdrop-blur-md rounded text-[10px] text-white font-mono">
+            <div class="relative rounded-lg overflow-hidden border border-slate-200 bg-slate-900">
+              <img id="photo-preview" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800"
+                alt="Evidence" class="w-full h-44 object-cover">
+              <div id="photo-badge"
+                class="absolute top-2 left-2 px-2 py-0.5 bg-black/75 backdrop-blur-md rounded text-[10px] text-white font-mono flex items-center gap-1.5 shadow">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="photo-badge-text">DEMO PRESET EVIDENCE</span>
+              </div>
+              <div class="absolute bottom-2 right-2 px-2 py-0.5 bg-black/60 backdrop-blur-md rounded text-[9px] text-slate-300 font-mono">
                 CAMERA EXIF: 28.6289° N, 77.2065° E
               </div>
             </div>
 
+            <!-- Real Camera / File Upload Trigger Button -->
+            <input type="file" id="report-photo-input" accept="image/*" capture="environment" class="hidden">
+            <div class="flex items-center gap-2">
+              <button type="button" id="trigger-camera-btn"
+                class="flex-1 py-2.5 px-3 rounded-lg bg-gov-navy hover:bg-slate-800 text-white font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition">
+                <i class="fa-solid fa-camera text-gov-saffron"></i>
+                <span>📸 Take Live Photo / Upload File</span>
+              </button>
+              <button type="button" id="reset-preset-photo"
+                class="hidden px-3 py-2.5 rounded-lg border border-slate-300 hover:bg-slate-100 text-slate-600 text-xs font-semibold transition"
+                title="Reset to preset">
+                <i class="fa-solid fa-rotate-left"></i>
+              </button>
+            </div>
+            <p class="text-[10px] text-slate-500 text-center">
+              Real device photos are optimized & permanently saved to Supabase cloud.
+            </p>
+
             <!-- AI Diagnostic Box -->
-            <div id="ai-scan-result" class="p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-xs space-y-1.5 transition-all">
+            <div id="ai-scan-result"
+              class="p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-xs space-y-1.5 transition-all">
               <div class="flex items-center justify-between text-gov-blue font-bold">
                 <span class="flex items-center gap-1.5"><i class="fa-solid fa-brain"></i> AI Triage Diagnostic</span>
                 <span class="text-emerald-700 font-mono" id="ai-conf">96.4% Match</span>
               </div>
-              <p class="text-slate-800 text-xs font-medium" id="ai-detected">Object: Asphalt Surface Damage (Pothole)</p>
+              <p class="text-slate-800 text-xs font-medium" id="ai-detected">Object: Asphalt Surface Damage (Pothole)
+              </p>
               <div class="flex items-center justify-between text-[11px] text-slate-600 border-t border-blue-100 pt-1">
                 <span>Severity: <strong class="text-amber-700" id="ai-sev">HIGH</strong></span>
                 <span>Duplicate Check: <strong class="text-emerald-700">0 within 45m radius</strong></span>
@@ -446,12 +532,14 @@
           <!-- Mini Wallet Card -->
           <div class="bg-white rounded-xl p-4 border border-gov-border shadow-sm flex items-center justify-between">
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
+              <div
+                class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
                 ⭐
               </div>
               <div>
                 <h4 class="font-bold text-gov-navy text-xs" id="citizen-name">Aarav Sharma</h4>
-                <p class="text-[11px] text-slate-500">Citizen Level: <span class="text-amber-700 font-bold" id="citizen-badge">Ward Hero 🥈</span></p>
+                <p class="text-[11px] text-slate-500">Citizen Level: <span class="text-amber-700 font-bold"
+                    id="citizen-badge">Ward Hero 🥈</span></p>
               </div>
             </div>
             <div class="text-right">
@@ -469,20 +557,24 @@
     <!-- VIEW C: TRACK STATUS                                 -->
     <!-- ==================================================== -->
     <section id="section-track" class="page-section hidden space-y-6">
-      
+
       <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm">
         <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
-          <i class="fa-solid fa-magnifying-glass-location text-gov-blue"></i> Track Grievance Status / शिकायत की स्थिति जांचें
+          <i class="fa-solid fa-magnifying-glass-location text-gov-blue"></i> Track Grievance Status / शिकायत की स्थिति
+          जांचें
         </h2>
-        <p class="text-xs text-slate-500">Search docket reference number to inspect real-time contractor progress and verified completion proof.</p>
+        <p class="text-xs text-slate-500">Search docket reference number to inspect real-time contractor progress and
+          verified completion proof.</p>
       </div>
 
       <div class="bg-white rounded-xl p-6 border border-gov-border shadow-sm space-y-4">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Enter Docket / Issue ID</label>
           <div class="flex gap-2">
-            <input type="text" id="track-search-input" placeholder="e.g. ISS-8041, ISS-8039" class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm flex-1 text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white font-mono">
-            <button onclick="window.app.searchDocket()" class="px-5 py-2 bg-gov-blue hover:bg-gov-navy text-white text-xs font-bold rounded-lg transition flex items-center gap-2">
+            <input type="text" id="track-search-input" placeholder="e.g. ISS-8041, ISS-8039"
+              class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm flex-1 text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white font-mono">
+            <button onclick="window.app.searchDocket()"
+              class="px-5 py-2 bg-gov-blue hover:bg-gov-navy text-white text-xs font-bold rounded-lg transition flex items-center gap-2">
               <i class="fa-solid fa-magnifying-glass"></i> Track Docket
             </button>
           </div>
@@ -502,8 +594,9 @@
     <!-- VIEW D: MUNICIPAL ADMIN PORTAL                       -->
     <!-- ==================================================== -->
     <section id="section-municipality" class="page-section hidden space-y-6">
-      
-      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+
+      <div
+        class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
         <div>
           <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
             <i class="fa-solid fa-building-columns text-gov-blue"></i> Municipal Nodal Officer Command Center
@@ -511,7 +604,8 @@
           <p class="text-xs text-slate-500">Public Works & Urban Engineering Division • Central Municipal Zone</p>
         </div>
         <div class="flex items-center gap-2">
-          <select id="municipality-filter" class="px-3 py-1.5 bg-gov-ash border border-slate-300 rounded-lg text-xs font-semibold text-slate-700">
+          <select id="municipality-filter"
+            class="px-3 py-1.5 bg-gov-ash border border-slate-300 rounded-lg text-xs font-semibold text-slate-700">
             <option value="all">All Grievances</option>
             <option value="pending">Pending Assignment</option>
             <option value="in progress">In Progress (SLA Active)</option>
@@ -543,19 +637,23 @@
 
       <!-- GIS Map & Triage Table -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        
+
         <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-gov-border shadow-sm flex flex-col h-[520px]">
           <div class="flex items-center justify-between mb-2">
             <div>
               <h3 class="font-bold text-gov-navy text-xs md:text-sm flex items-center gap-1.5">
                 <i class="fa-solid fa-map-location-dot text-gov-blue"></i> GIS Spatial Grievance Heatmap
               </h3>
-              <p class="text-[11px] text-slate-500">Live spatial clustering of citizen reported infrastructure defects</p>
+              <p class="text-[11px] text-slate-500">Live spatial clustering of citizen reported infrastructure defects
+              </p>
             </div>
             <div class="flex items-center gap-2 text-[10px]">
-              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Critical</span>
-              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> High</span>
-              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Closed</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+                Critical</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                High</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>
+                Closed</span>
             </div>
           </div>
           <div id="gis-map" class="w-full flex-1 rounded-lg overflow-hidden border border-slate-200 z-10"></div>
@@ -571,7 +669,8 @@
 
           <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-lg">
             <table class="w-full text-left text-xs text-slate-700">
-              <thead class="bg-gov-ash sticky top-0 text-[11px] text-slate-600 uppercase tracking-wider border-b border-slate-200">
+              <thead
+                class="bg-gov-ash sticky top-0 text-[11px] text-slate-600 uppercase tracking-wider border-b border-slate-200">
                 <tr>
                   <th class="p-2.5">Docket / Title</th>
                   <th class="p-2.5">Severity</th>
@@ -594,18 +693,25 @@
     <!-- VIEW E: CONTRACTOR DESK                              -->
     <!-- ==================================================== -->
     <section id="section-contractor" class="page-section hidden space-y-6">
-      
-      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+
+      <div
+        class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
         <div class="flex items-center gap-3">
-          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold">
+          <div
+            class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold">
             <i class="fa-solid fa-helmet-safety"></i>
           </div>
           <div>
             <div class="flex items-center gap-2">
               <h2 class="text-base font-bold text-gov-navy">Apex Road Infrastructure Ltd</h2>
-              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-gov-blue border border-blue-200">Empanelled Vendor</span>
+              <span
+                class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-gov-blue border border-blue-200">Empanelled
+                Vendor</span>
             </div>
-            <p class="text-xs text-slate-500">Vendor ID: <span class="font-mono text-slate-700 font-semibold">CONT-01</span> • Specialization: <strong class="text-gov-blue">Potholes & Roads</strong> • Quality Score: <strong class="text-amber-600">★ 4.8</strong></p>
+            <p class="text-xs text-slate-500">Vendor ID: <span
+                class="font-mono text-slate-700 font-semibold">CONT-01</span> • Specialization: <strong
+                class="text-gov-blue">Potholes & Roads</strong> • Quality Score: <strong class="text-amber-600">★
+                4.8</strong></p>
           </div>
         </div>
 
@@ -637,23 +743,26 @@
     <!-- VIEW F: REWARDS STORE & REDEMPTION CATALOG           -->
     <!-- ==================================================== -->
     <section id="section-rewards" class="page-section hidden space-y-6">
-      
+
       <!-- Wallet Banner -->
-      <div class="bg-gradient-to-r from-gov-navy via-gov-blue to-gov-lightBlue text-white rounded-2xl p-6 md:p-8 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 border border-gov-blue">
+      <div
+        class="bg-gradient-to-r from-gov-navy via-gov-blue to-gov-lightBlue text-white rounded-2xl p-6 md:p-8 shadow-lg flex flex-col md:flex-row items-center justify-between gap-6 border border-gov-blue">
         <div class="space-y-2">
           <span class="px-3 py-1 rounded-full bg-white/10 text-gov-saffron text-xs font-bold border border-white/20">
             <i class="fa-solid fa-coins mr-1"></i> Civic Contribution Tokenomics
           </span>
           <h2 class="text-2xl md:text-3xl font-extrabold">Citizen Rewards & Redemption Store</h2>
           <p class="text-xs md:text-sm text-slate-200 max-w-xl">
-            Every verified complaint earns you points. Redeem your points for Metro card recharge, municipal parking coupons, or property tax discounts!
+            Every verified complaint earns you points. Redeem your points for Metro card recharge, municipal parking
+            coupons, or property tax discounts!
           </p>
         </div>
 
         <div class="bg-white/10 backdrop-blur-md border border-white/20 rounded-xl p-5 text-center min-w-[200px]">
           <p class="text-xs text-slate-200 uppercase font-semibold">Your Wallet Balance</p>
           <p class="text-3xl md:text-4xl font-black text-gov-saffron font-mono mt-1" id="wallet-user-pts">540</p>
-          <p class="text-[11px] text-emerald-300 font-semibold mt-1"><i class="fa-solid fa-circle-check"></i> Active & Redeemable</p>
+          <p class="text-[11px] text-emerald-300 font-semibold mt-1"><i class="fa-solid fa-circle-check"></i> Active &
+            Redeemable</p>
         </div>
       </div>
 
@@ -672,13 +781,14 @@
 
       <!-- Claimed Vouchers History & Leaderboard -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 pt-2">
-        
+
         <!-- Left: Claimed Vouchers -->
         <div class="lg:col-span-5 bg-white p-5 rounded-xl border border-gov-border shadow-sm space-y-3">
           <h4 class="font-bold text-gov-navy text-sm flex items-center gap-2">
             <i class="fa-solid fa-receipt text-gov-blue"></i> My Claimed Vouchers
           </h4>
-          <p class="text-xs text-slate-500">Copy the coupon codes below to redeem on municipal or transport partner portals.</p>
+          <p class="text-xs text-slate-500">Copy the coupon codes below to redeem on municipal or transport partner
+            portals.</p>
           <div id="claimed-vouchers-list" class="space-y-2 pt-1">
             <!-- Injected via rewardsView.js -->
           </div>
@@ -693,7 +803,9 @@
               </h4>
               <p class="text-xs text-slate-500">Top citizens driving civic improvement this month</p>
             </div>
-            <span class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Active Season</span>
+            <span
+              class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Active
+              Season</span>
           </div>
 
           <div class="space-y-2.5" id="leaderboard-container">
@@ -709,12 +821,13 @@
     <!-- VIEW G: RELATED GOVERNMENT CIVIC PORTALS             -->
     <!-- ==================================================== -->
     <section id="section-portals" class="page-section hidden space-y-6">
-      
+
       <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm">
         <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
           <i class="fa-solid fa-landmark-dome text-gov-blue"></i> Related Government Portals & Departmental Network
         </h2>
-        <p class="text-xs text-slate-500">Inter-connected national and state departments handling civic infrastructure, waste, and highway grievances.</p>
+        <p class="text-xs text-slate-500">Inter-connected national and state departments handling civic infrastructure,
+          waste, and highway grievances.</p>
       </div>
 
       <!-- Portals Grid -->
@@ -729,51 +842,64 @@
   <!-- ======================================================== -->
   <!-- 5. AUTHENTICATION MODAL (SIGN IN / SIGN UP)              -->
   <!-- ======================================================== -->
-  <div id="auth-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="auth-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white border border-slate-300 rounded-2xl p-6 shadow-2xl space-y-4">
-      
+
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <div>
           <h3 id="auth-modal-title" class="font-bold text-gov-navy text-base">Sign In to CivicSamadhan</h3>
           <p id="auth-modal-subtitle" class="text-xs text-slate-500">Access your citizen dashboard, reports & points</p>
         </div>
-        <button onclick="window.app.closeAuthModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="window.app.closeAuthModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i
+            class="fa-solid fa-xmark"></i></button>
       </div>
 
       <!-- Tab Switcher -->
       <div class="flex border-b border-slate-200">
-        <button type="button" onclick="window.app.openAuthModal('signup')" class="flex-1 py-2 text-center text-xs font-bold border-b-2 transition" id="auth-tab-signup">
+        <button type="button" onclick="window.app.openAuthModal('signup')"
+          class="flex-1 py-2 text-center text-xs font-bold border-b-2 transition" id="auth-tab-signup">
           New User? Sign Up
         </button>
-        <button type="button" onclick="window.app.openAuthModal('login')" class="flex-1 py-2 text-center text-xs font-bold border-b-2 transition text-slate-400 border-transparent hover:text-gov-blue" id="auth-tab-login">
+        <button type="button" onclick="window.app.openAuthModal('login')"
+          class="flex-1 py-2 text-center text-xs font-bold border-b-2 transition text-slate-400 border-transparent hover:text-gov-blue"
+          id="auth-tab-login">
           Existing User? Sign In
         </button>
       </div>
 
       <form id="auth-form" class="space-y-3.5">
-        
+
         <!-- Name (Sign up only) -->
         <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span class="text-rose-500">*</span></label>
-          <input type="text" id="auth-name" placeholder="e.g. Aarav Sharma" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Full Name <span
+              class="text-rose-500">*</span></label>
+          <input type="text" id="auth-name" placeholder="e.g. Aarav Sharma"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
         </div>
 
         <!-- Email -->
         <div>
-          <label class="block text-xs font-bold text-slate-700 mb-1">Email Address <span class="text-rose-500">*</span></label>
-          <input type="email" id="auth-email" required placeholder="name@domain.com" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Email Address <span
+              class="text-rose-500">*</span></label>
+          <input type="email" id="auth-email" required placeholder="name@domain.com"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
         </div>
 
         <!-- Phone (Sign up only) -->
         <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number <span class="text-rose-500">*</span></label>
-          <input type="tel" id="auth-phone" placeholder="+91 98765 43210" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Phone Number <span
+              class="text-rose-500">*</span></label>
+          <input type="tel" id="auth-phone" placeholder="+91 98765 43210"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
         </div>
 
         <!-- Role Select (Sign up only) -->
         <div class="auth-signup-only">
-          <label class="block text-xs font-bold text-slate-700 mb-1">Register As <span class="text-rose-500">*</span></label>
-          <select id="auth-role" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <label class="block text-xs font-bold text-slate-700 mb-1">Register As <span
+              class="text-rose-500">*</span></label>
+          <select id="auth-role"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
             <option value="citizen">Citizen (नागरिक) - Report issues & earn rewards</option>
             <option value="contractor">Contractor / Field Agency - Accept & resolve work orders</option>
             <option value="municipality">Municipal Nodal Officer - Triage & allocate resources</option>
@@ -783,43 +909,81 @@
         <!-- Password -->
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Password</label>
-          <input type="password" id="auth-password" placeholder="••••••••" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
+          <input type="password" id="auth-password" placeholder="••••••••"
+            class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue">
         </div>
 
         <!-- Submit Button -->
-        <button type="submit" id="auth-submit-btn" class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition">
+        <button type="submit" id="auth-submit-btn"
+          class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition">
           Create Account (+100 Bonus Pts)
         </button>
       </form>
     </div>
   </div>
 
+  <!-- Modal: Email Confirmation Notice -->
+  <div id="confirm-email-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white border border-slate-300 rounded-2xl p-6 shadow-2xl space-y-4 text-center">
+      <div class="w-16 h-16 mx-auto rounded-full bg-blue-50 text-gov-blue flex items-center justify-center text-2xl shadow-inner">
+        <i class="fa-solid fa-envelope-circle-check"></i>
+      </div>
+      <div>
+        <h3 class="font-bold text-gov-navy text-lg">Verify Your Email Address</h3>
+        <p class="text-xs text-slate-600 mt-1">
+          A verification link has been dispatched to:
+        </p>
+        <p id="confirm-email-target" class="text-xs font-mono font-bold text-gov-blue bg-blue-50 py-1.5 px-3 rounded mt-2 break-all border border-blue-200">
+          user@example.com
+        </p>
+      </div>
+      <div class="bg-amber-50 border border-amber-200 rounded-lg p-3 text-[11px] text-amber-900 text-left space-y-1">
+        <div class="font-bold flex items-center gap-1.5">
+          <i class="fa-solid fa-circle-info text-amber-600"></i> Next Step:
+        </div>
+        <p>1. Open your email inbox (and check the Spam/Promotions folder).</p>
+        <p>2. Click the confirmation link from Supabase.</p>
+        <p>3. Return here and Sign In to start reporting and redeeming rewards.</p>
+      </div>
+      <button onclick="window.app.closeEmailConfirmationModal()"
+        class="w-full py-2.5 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs shadow-md transition">
+        I Checked My Inbox — Proceed to Sign In
+      </button>
+    </div>
+  </div>
+
   <!-- Modal: Assign Contractor -->
-  <div id="assign-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="assign-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="w-full max-w-md bg-white border border-slate-300 rounded-xl p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
           <i class="fa-solid fa-user-plus text-gov-blue"></i> Allocate Contractor
         </h3>
-        <button onclick="window.app.closeAssignModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="window.app.closeAssignModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i
+            class="fa-solid fa-xmark"></i></button>
       </div>
 
       <div class="space-y-3">
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Target Grievance</label>
-          <p id="modal-issue-title" class="text-xs font-semibold text-slate-800 bg-gov-ash p-2 rounded border border-slate-200 truncate"></p>
+          <p id="modal-issue-title"
+            class="text-xs font-semibold text-slate-800 bg-gov-ash p-2 rounded border border-slate-200 truncate"></p>
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Select Empanelled Contractor</label>
-          <select id="modal-contractor-select" class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-gov-blue">
+          <select id="modal-contractor-select"
+            class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-gov-blue">
             <!-- Injected dynamically -->
           </select>
         </div>
 
         <div>
           <label class="block text-xs font-bold text-slate-700 mb-1">Enforced Resolution SLA Window</label>
-          <select id="modal-sla-select" class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800">
+          <select id="modal-sla-select"
+            class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800">
             <option value="12">12 Hours (Emergency / High Hazard)</option>
             <option value="24" selected>24 Hours (Standard Civic SLA)</option>
             <option value="48">48 Hours (Major Civil Works)</option>
@@ -828,23 +992,29 @@
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
-        <button onclick="window.app.closeAssignModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-        <button onclick="window.app.confirmAssignment()" class="px-4 py-2 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs shadow">Confirm Allocation</button>
+        <button onclick="window.app.closeAssignModal()"
+          class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button onclick="window.app.confirmAssignment()"
+          class="px-4 py-2 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs shadow">Confirm
+          Allocation</button>
       </div>
     </div>
   </div>
 
   <!-- Modal: Citizen Resolution Verification -->
-  <div id="verify-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+  <div id="verify-modal"
+    class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="w-full max-w-lg bg-white border border-slate-300 rounded-xl p-6 shadow-2xl space-y-4">
       <div class="flex items-center justify-between border-b border-slate-100 pb-3">
         <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
           <i class="fa-solid fa-circle-check text-emerald-600"></i> Verify Resolution Proof
         </h3>
-        <button onclick="window.app.closeVerifyModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+        <button onclick="window.app.closeVerifyModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i
+            class="fa-solid fa-xmark"></i></button>
       </div>
 
-      <p class="text-xs text-slate-600">The assigned contractor has submitted repair evidence. Inspect the Before vs After photo evidence:</p>
+      <p class="text-xs text-slate-600">The assigned contractor has submitted repair evidence. Inspect the Before vs
+        After photo evidence:</p>
 
       <div class="grid grid-cols-2 gap-3">
         <div>
@@ -863,8 +1033,10 @@
       </div>
 
       <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
-        <button onclick="window.app.closeVerifyModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-xs text-slate-600">Close</button>
-        <button onclick="window.app.confirmCitizenVerification()" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5">
+        <button onclick="window.app.closeVerifyModal()"
+          class="px-4 py-2 rounded-lg border border-slate-300 text-xs text-slate-600">Close</button>
+        <button onclick="window.app.confirmCitizenVerification()"
+          class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5">
           <i class="fa-solid fa-check-double"></i> Confirm & Claim +45 Tokens
         </button>
       </div>
@@ -876,21 +1048,26 @@
   <!-- ======================================================== -->
   <footer class="bg-gov-navy text-white text-xs border-t-4 border-gov-saffron mt-auto">
     <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
-      
+
       <div class="space-y-2">
         <h4 class="font-bold text-gov-saffron text-sm uppercase">About CivicSamadhan</h4>
         <p class="text-slate-300 text-[11px] leading-relaxed">
-          CivicSamadhan is a centralized civic grievance monitoring and reward platform empowering citizens and municipal bodies with transparent, time-bound urban infrastructure redressal.
+          CivicSamadhan is a centralized civic grievance monitoring and reward platform empowering citizens and
+          municipal bodies with transparent, time-bound urban infrastructure redressal.
         </p>
       </div>
 
       <div class="space-y-1.5">
         <h4 class="font-bold text-gov-saffron text-sm uppercase">Quick Navigation</h4>
         <ul class="space-y-1 text-slate-300 text-[11px]">
-          <li><a href="#" onclick="window.app.switchSection('lodge')" class="hover:text-gov-saffron">Lodge Civic Complaint</a></li>
-          <li><a href="#" onclick="window.app.switchSection('track')" class="hover:text-gov-saffron">Track Docket Status</a></li>
-          <li><a href="#" onclick="window.app.switchSection('rewards')" class="hover:text-gov-saffron">Redeem Civic Rewards</a></li>
-          <li><a href="#" onclick="window.app.switchSection('portals')" class="hover:text-gov-saffron">Integrated Govt Portals</a></li>
+          <li><a href="#" onclick="window.app.switchSection('lodge')" class="hover:text-gov-saffron">Lodge Civic
+              Complaint</a></li>
+          <li><a href="#" onclick="window.app.switchSection('track')" class="hover:text-gov-saffron">Track Docket
+              Status</a></li>
+          <li><a href="#" onclick="window.app.switchSection('rewards')" class="hover:text-gov-saffron">Redeem Civic
+              Rewards</a></li>
+          <li><a href="#" onclick="window.app.switchSection('portals')" class="hover:text-gov-saffron">Integrated Govt
+              Portals</a></li>
         </ul>
       </div>
 
@@ -920,4 +1097,5 @@
 
   <script type="module" src="src/js/app.js"></script>
 </body>
+
 </html>

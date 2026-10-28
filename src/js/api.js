@@ -2,10 +2,10 @@
  * CivicSamadhan Unified API & Supabase Direct Cloud Connector
  * 
  * Works in both environments:
- * 1. GitHub Pages (Static hosting without Node backend): Communicates directly with Supabase Cloud
+ * 1. GitHub Pages (Static hosting): Communicates directly with Supabase Cloud
  * 2. Localhost / Node server: Uses direct REST / Supabase Cloud endpoints
  * 
- * Guarantees that ALL data (issues, points, users) is saved permanently in the Supabase Cloud backend!
+ * Strictly validates credentials against Supabase.
  */
 
 const SUPABASE_URL = 'https://irgxrbovjxocmecsyfbd.supabase.co';
@@ -27,103 +27,96 @@ export const apiClient = {
       ...extraHeaders
     };
 
-    try {
-      const options = {
-        method,
-        headers,
-        ...(body ? { body: JSON.stringify(body) } : {})
-      };
+    const options = {
+      method,
+      headers,
+      ...(body ? { body: JSON.stringify(body) } : {})
+    };
 
-      const res = await fetch(url, options);
-      const data = await res.json().catch(() => null);
+    const res = await fetch(url, options);
+    const data = await res.json().catch(() => null);
 
-      if (!res.ok) {
-        throw new Error(data?.msg || data?.message || data?.error_description || data?.error || `HTTP ${res.status}`);
-      }
-      return data;
-    } catch (err) {
-      console.warn(`[Supabase REST] ${tableOrEndpoint} fallback:`, err.message);
+    if (!res.ok) {
+      const err = new Error(data?.msg || data?.message || data?.error_description || data?.error || `HTTP ${res.status}`);
+      err.code = data?.error_code || data?.code;
       throw err;
     }
+    return data;
   },
 
-  // 1. Authentication (Real Supabase Auth with Email Confirmation)
+  // 1. Real Supabase Authentication
   async signup({ name, email, phone, role, password }) {
+    if (!name || !email || !password) {
+      throw new Error('Please fill all mandatory fields: name, email, and password.');
+    }
+
     try {
-      // Calls Supabase Auth - Automatically sends real confirmation email!
+      // Calls Supabase Auth - Automatically triggers verification email!
       const authRes = await this.supabaseRest('auth/v1/signup', 'POST', {
-        email,
-        password: password || 'CivicSecurePass2026!',
+        email: email.trim().toLowerCase(),
+        password,
         data: {
-          name,
-          phone,
-          role
+          name: name.trim(),
+          phone: phone ? phone.trim() : '',
+          role: role.toLowerCase()
         }
       });
 
       const user = {
         id: authRes.id || `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-        name,
-        email,
-        phone,
+        name: name.trim(),
+        email: email.trim().toLowerCase(),
+        phone: phone ? phone.trim() : '',
         role: role.toLowerCase(),
-        points: 100, // +100 Welcome Points
+        points: 100,
         badge: 'Civic Novice 🥉'
       };
 
-      // Save user to cloud leaderboard / users
-      try {
-        await this.supabaseRest('leaderboard', 'POST', {
-          user_id: user.id,
-          name: `${user.name} (You)`,
-          points: 100,
-          issues_resolved: 0,
-          badge: 'Civic Novice 🥉',
-          tier: 'Bronze'
-        });
-      } catch (e) {
-        console.warn('Leaderboard cloud sync:', e.message);
+      // Register contractor if contractor role
+      if (role.toLowerCase() === 'contractor') {
+        try {
+          await this.supabaseRest('contractors', 'POST', {
+            id: `CONT-${Math.floor(10 + Math.random() * 90)}`,
+            name: user.name,
+            category: 'Potholes & General Civil Works',
+            rating: 5.0,
+            completed_jobs: 0,
+            active_jobs: 0,
+            avg_turnaround_hours: 24.0
+          });
+        } catch (e) {
+          console.warn('Contractor cloud registration:', e.message);
+        }
       }
 
       return {
         success: true,
         confirmationSent: Boolean(authRes.confirmation_sent_at),
-        message: 'Account created! 📧 A confirmation email has been dispatched to your inbox. Please check your email to verify.',
+        message: `Account created! 📧 A verification link has been sent to ${email}. Please check your inbox and confirm before signing in.`,
         user
       };
     } catch (err) {
-      // Fallback local registration if Supabase rate-limits or offline
-      const user = {
-        id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-        name,
-        email,
-        phone,
-        role: role.toLowerCase(),
-        points: 100,
-        badge: 'Civic Novice 🥉'
-      };
-      return {
-        success: true,
-        confirmationSent: true,
-        message: 'Account created! Please check your email inbox for the verification link.',
-        user
-      };
+      throw new Error(err.message || 'Signup failed.');
     }
   },
 
   async login({ email, password }) {
+    if (!email || !password) {
+      throw new Error('Please enter both your registered email and password.');
+    }
+
     try {
-      // Try Supabase password auth
+      // Real Supabase Auth verification
       const authRes = await this.supabaseRest('auth/v1/token?grant_type=password', 'POST', {
-        email,
-        password: password || 'CivicSecurePass2026!'
+        email: email.trim().toLowerCase(),
+        password
       });
 
       const meta = authRes.user?.user_metadata || {};
       const user = {
-        id: authRes.user?.id || 'USR-101',
+        id: authRes.user.id,
         name: meta.name || email.split('@')[0],
-        email,
+        email: email.toLowerCase(),
         phone: meta.phone || '+91 98765 00000',
         role: (meta.role || 'citizen').toLowerCase(),
         points: 150,
@@ -136,27 +129,18 @@ export const apiClient = {
         user
       };
     } catch (err) {
-      // Fallback demo login so user is never blocked
-      const role = email.includes('contractor') ? 'contractor' : (email.includes('admin') || email.includes('officer') ? 'municipality' : 'citizen');
-      const name = email.split('@')[0].replace(/[._]/g, ' ');
-      const user = {
-        id: `USR-${Math.floor(1000 + Math.random() * 9000)}`,
-        name: name.charAt(0).toUpperCase() + name.slice(1),
-        email,
-        phone: '+91 98765 00000',
-        role,
-        points: 150,
-        badge: 'Active Member'
-      };
-      return {
-        success: true,
-        message: `Welcome back, ${user.name}!`,
-        user
-      };
+      // STRICT ERROR REPORTING - NO FAKE AUTO-LOGIN!
+      if (err.code === 'email_not_confirmed' || err.message?.includes('not confirmed')) {
+        throw new Error('📧 Email not confirmed! Please open your email inbox and click the verification link sent by Supabase.');
+      }
+      if (err.code === 'invalid_credentials' || err.message?.includes('Invalid login')) {
+        throw new Error('❌ No account found with these credentials. Please check your password or Sign Up first!');
+      }
+      throw new Error(`Authentication error: ${err.message}`);
     }
   },
 
-  // 2. Issues (Direct Supabase Cloud)
+  // 2. Real Issues & Image Persistence (Direct Supabase Cloud)
   async fetchIssues() {
     try {
       const rows = await this.supabaseRest('issues?select=*&order=created_at.desc');
@@ -197,16 +181,16 @@ export const apiClient = {
       title: payload.title,
       description: payload.description,
       category: payload.category,
-      severity: 'High',
+      severity: payload.severity || 'High',
       status: 'Pending',
       location_address: payload.location?.address || '',
       lat: payload.location?.lat || 28.6289,
       lng: payload.location?.lng || 77.2065,
-      image_url: payload.imageUrl,
+      image_url: payload.imageUrl, // Real uploaded photo (Base64 or Cloud URL)
       reported_by: payload.reportedBy || { name: 'Citizen', phone: '+91 98765 43210' },
       assigned_to: null,
       resolution: null,
-      ai_metadata: {
+      ai_metadata: payload.aiMetadata || {
         detectedObject: 'Urban Infrastructure Hazard',
         confidence: 96.4,
         hazardScore: 8.5
@@ -228,11 +212,10 @@ export const apiClient = {
 
     return {
       success: true,
-      message: 'Grievance saved permanently in Supabase Cloud database.',
+      message: 'Grievance with real photo saved permanently in Supabase Cloud database.',
       data: {
         ...payload,
         id: issueId,
-        severity: 'High',
         status: 'Pending',
         reportedAt: new Date().toISOString()
       }
@@ -273,7 +256,7 @@ export const apiClient = {
       status: 'Under Verification',
       resolution: {
         resolvedAt: new Date().toISOString(),
-        resolvedImageUrl,
+        resolvedImageUrl, // Real contractor proof photo!
         notes,
         verifiedByCitizen: false
       }

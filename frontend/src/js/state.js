@@ -12,15 +12,8 @@ function getStoredUser() {
 }
 
 export const appState = {
-  currentUser: getStoredUser() || {
-    id: 'USR-101',
-    name: 'Aarav Sharma',
-    email: 'aarav.sharma@example.com',
-    phone: '+91 98765 43210',
-    role: 'citizen',
-    points: 540,
-    badge: 'Ward Hero 🥈'
-  },
+  // Defaults to null (Guest mode) unless user has actively signed in!
+  currentUser: getStoredUser(),
   
   issues: [],
   contractors: [],
@@ -29,14 +22,7 @@ export const appState = {
   activeFilter: 'all',
 
   // Claimed vouchers history
-  claimedVouchers: [
-    {
-      title: 'Smart City Parking Pass (10 Hours)',
-      code: 'CIVIC-PRK-8921',
-      date: '2026-10-25',
-      points: 150
-    }
-  ],
+  claimedVouchers: JSON.parse(localStorage.getItem('civic_claimed_vouchers') || '[]'),
 
   // Integrated Government Civic Portals
   govPortals: [
