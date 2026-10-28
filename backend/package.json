@@ -1,0 +1,19 @@
+{
+  "name": "jansetu-backend",
+  "version": "1.0.0",
+  "description": "Civic issue management API with Supabase integration and AI triage",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "keywords": [
+    "civic-tech",
+    "supabase",
+    "nodejs",
+    "api"
+  ],
+  "author": "Utkarsh Mishra",
+  "license": "MIT"
+}
+

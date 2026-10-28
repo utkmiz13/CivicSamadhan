@@ -1,0 +1,850 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CivicSamadhan | Centralized Civic Grievance Redressal and Monitoring System</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Google Fonts (Merriweather for Gov Serif & Inter for UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700&family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <!-- Leaflet Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            gov: {
+              navy: '#0B2545',
+              blue: '#133E70',
+              lightBlue: '#1D4E89',
+              saffron: '#FF9933',
+              green: '#138808',
+              ash: '#F4F6F9',
+              border: '#D0D7DE'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', 'sans-serif'],
+            hindi: ['Noto Sans Devanagari', 'sans-serif'],
+            govTitle: ['Cinzel', 'serif']
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="/src/css/style.css">
+</head>
+<body class="bg-gov-ash text-slate-800 min-h-screen font-sans antialiased flex flex-col">
+
+  <!-- ======================================================== -->
+  <!-- 1. TOPMOST GOVERNMENT ACCESSIBILITY & TRICOLOR BAR       -->
+  <!-- ======================================================== -->
+  <div class="bg-gov-navy text-white text-xs border-b border-gov-blue/50">
+    <div class="max-w-7xl mx-auto px-4 py-1.5 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-3">
+        <span class="font-medium text-slate-200">भारत सरकार | Government of India</span>
+        <span class="hidden md:inline text-slate-400">•</span>
+        <span class="hidden md:inline text-slate-300">आवास एवं शहरी कार्य मंत्रालय | Ministry of Housing & Urban Affairs</span>
+      </div>
+      <div class="flex items-center gap-4 text-[11px]">
+        <div class="hidden sm:flex items-center gap-1.5 text-slate-300">
+          <i class="fa-solid fa-phone-volume text-gov-saffron"></i>
+          <span>Toll-Free Helpline: <strong>1800-11-2026</strong> (24x7)</span>
+        </div>
+        <div class="flex items-center gap-2 border-l border-slate-700 pl-3">
+          <button onclick="window.app.adjustFontSize(-1)" class="hover:text-gov-saffron font-bold px-1" title="Decrease font">A-</button>
+          <button onclick="window.app.adjustFontSize(0)" class="hover:text-gov-saffron font-bold px-1" title="Default font">A</button>
+          <button onclick="window.app.adjustFontSize(1)" class="hover:text-gov-saffron font-bold px-1" title="Increase font">A+</button>
+          <span class="text-gov-saffron font-bold ml-1">हिन्दी / ENG</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tricolor Saffron-White-Green Ribbon -->
+  <div class="h-1 w-full flex">
+    <div class="h-full w-1/3 bg-[#FF9933]"></div>
+    <div class="h-full w-1/3 bg-white"></div>
+    <div class="h-full w-1/3 bg-[#138808]"></div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 2. OFFICIAL EMBLEM & PORTAL IDENTITY BANNER              -->
+  <!-- ======================================================== -->
+  <header class="bg-white border-b border-gov-border shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col md:flex-row items-center justify-between gap-4">
+      
+      <!-- Emblem & Title -->
+      <div class="flex items-center gap-4">
+        <!-- Ashok Stambh Emblem Icon -->
+        <div class="w-14 h-14 rounded-full bg-slate-50 border-2 border-gov-blue/20 flex items-center justify-center p-1.5 shadow-sm">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/5/55/Emblem_of_India.svg" alt="Emblem of India" class="w-full h-full object-contain">
+        </div>
+
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-2xl md:text-3xl font-black tracking-tight text-gov-navy font-sans">
+              e-<span class="text-gov-blue">Civic</span><span class="text-gov-saffron">Samadhan</span>
+            </h1>
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-300">
+              <span class="w-2 h-2 rounded-full bg-emerald-600 animate-pulse mr-1"></span> LIVE PORTAL
+            </span>
+          </div>
+          <p class="text-xs md:text-sm font-semibold text-slate-600 font-hindi">
+            केन्द्रीकृत नागरिक शिकायत निवारण एवं निगरानी प्रणाली
+          </p>
+          <p class="text-[11px] text-slate-500 hidden sm:block">
+            Centralized Civic Grievance Redressal and Monitoring System (A National Smart City Initiative)
+          </p>
+        </div>
+      </div>
+
+      <!-- Government Badges & Digital India logo -->
+      <div class="hidden lg:flex items-center gap-4">
+        <div class="text-right border-r border-gov-border pr-4">
+          <p class="text-xs font-bold text-gov-navy">National Redressal SLA</p>
+          <p class="text-[11px] text-emerald-700 font-semibold"><i class="fa-solid fa-clock-rotate-left mr-1"></i> 24 to 48 Hours Bound</p>
+          <p class="text-[10px] text-slate-500 font-mono">Integrated with Supabase Cloud</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <div class="w-12 h-12 rounded-lg bg-gov-ash border border-slate-300 flex items-center justify-center font-bold text-xs text-gov-blue text-center leading-tight p-1">
+            DIGITAL<br>INDIA
+          </div>
+          <div class="w-12 h-12 rounded-lg bg-gov-ash border border-slate-300 flex items-center justify-center font-bold text-xs text-emerald-700 text-center leading-tight p-1">
+            SWACHH<br>BHARAT
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- ======================================================== -->
+  <!-- 3. MAIN NAVIGATION BAR (Classic Government Navy Blue)   -->
+  <!-- ======================================================== -->
+  <nav class="bg-gov-blue border-b-2 border-gov-saffron text-white sticky top-0 z-40 shadow-md">
+    <div class="max-w-7xl mx-auto px-4 flex items-center justify-between overflow-x-auto custom-scrollbar">
+      <div class="flex items-center whitespace-nowrap">
+        <button onclick="window.app.switchSection('home')" id="nav-home" class="nav-item active px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-gov-saffron bg-gov-navy">
+          <i class="fa-solid fa-house"></i> Home
+        </button>
+        <button onclick="window.app.switchSection('lodge')" id="nav-lodge" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-pen-to-square"></i> Lodge Grievance
+        </button>
+        <button onclick="window.app.switchSection('track')" id="nav-track" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-magnifying-glass-location"></i> Track Status
+        </button>
+        <button onclick="window.app.switchSection('municipality')" id="nav-municipality" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-building-columns"></i> Municipal Admin Portal
+        </button>
+        <button onclick="window.app.switchSection('contractor')" id="nav-contractor" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-helmet-safety"></i> Contractor Desk
+        </button>
+        <button onclick="window.app.switchSection('rewards')" id="nav-rewards" class="nav-item px-4 py-3 text-xs md:text-sm font-semibold hover:bg-gov-navy transition flex items-center gap-2 border-b-2 border-transparent">
+          <i class="fa-solid fa-award text-gov-saffron"></i> Civic Rewards & Web3
+        </button>
+      </div>
+
+      <!-- Quick Action: Emergency Reset -->
+      <div class="hidden sm:flex items-center pl-4">
+        <button onclick="window.app.resetDemoData()" title="Reset Database to Pristine Seed State" class="px-2.5 py-1 text-xs font-semibold bg-white/10 hover:bg-white/20 rounded border border-white/20 transition flex items-center gap-1.5 text-slate-200">
+          <i class="fa-solid fa-rotate-left"></i> Reset Seed
+        </button>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Notification Banner Container -->
+  <div id="toast-container" class="fixed bottom-6 right-6 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- ======================================================== -->
+  <!-- 4. MAIN CONTENT AREA                                     -->
+  <!-- ======================================================== -->
+  <main class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-6 space-y-6">
+
+    <!-- ==================================================== -->
+    <!-- VIEW A: HOME DASHBOARD (Like samadhaan.ugc.ac.in)    -->
+    <!-- ==================================================== -->
+    <section id="section-home" class="page-section block space-y-6">
+      
+      <!-- Hero Banner (e-Samadhan Style) -->
+      <div class="rounded-2xl overflow-hidden bg-gradient-to-r from-gov-navy via-gov-blue to-gov-lightBlue text-white shadow-xl relative border border-gov-blue/50">
+        <div class="p-6 md:p-10 relative z-10 max-w-3xl space-y-3">
+          <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/20 text-xs font-semibold text-gov-saffron">
+            <i class="fa-solid fa-shield-halved"></i> 24x7 Citizen Redressal Mechanism
+          </div>
+          <h2 class="text-2xl md:text-4xl font-extrabold tracking-tight leading-tight">
+            A Step Forward for Civic Grievance Monitoring & Redressal
+          </h2>
+          <p class="text-sm md:text-base text-slate-200 leading-relaxed">
+            Welcome to <strong class="text-white">CivicSamadhan</strong> — India's centralized single-window ICT platform integrating Citizens, Municipal Corporations, and Field Contractors. Powered by <strong class="text-gov-saffron">AI Defect Triage</strong>, automated geofencing, and verifiable <strong class="text-emerald-400">Proof-of-Resolution</strong>.
+          </p>
+
+          <div class="pt-3 flex flex-wrap items-center gap-3">
+            <button onclick="window.app.switchSection('lodge')" class="px-5 py-2.5 rounded-lg bg-gov-saffron hover:bg-amber-500 text-gov-navy font-bold text-xs md:text-sm shadow-md transition flex items-center gap-2">
+              <i class="fa-solid fa-pen-to-square"></i> Lodge Civic Grievance
+            </button>
+            <button onclick="window.app.switchSection('track')" class="px-5 py-2.5 rounded-lg bg-white/15 hover:bg-white/25 text-white font-semibold text-xs md:text-sm border border-white/30 transition flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass"></i> Track Grievance Status
+            </button>
+          </div>
+        </div>
+
+        <div class="hidden md:block absolute right-6 bottom-4 opacity-15 text-9xl pointer-events-none">
+          <i class="fa-solid fa-city"></i>
+        </div>
+      </div>
+
+      <!-- The 4 Core Role Action Cards (UGC e-Samadhan Style Grid) -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        
+        <!-- Card 1: Citizen Grievance Registration -->
+        <div onclick="window.app.switchSection('lodge')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-gov-blue flex items-center justify-center text-xl mb-3 group-hover:bg-gov-blue group-hover:text-white transition">
+              <i class="fa-solid fa-pen-to-square"></i>
+            </div>
+            <h3 class="font-bold text-base text-gov-navy mb-1">Lodge Grievance</h3>
+            <p class="text-xs text-slate-500 leading-normal">
+              Register civic defects with live camera snapshot, automated AI severity diagnosis, and GPS tagging.
+            </p>
+          </div>
+          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+            <span>Register Complaint</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Card 2: Track Status -->
+        <div onclick="window.app.switchSection('track')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-amber-50 text-gov-saffron flex items-center justify-center text-xl mb-3 group-hover:bg-gov-saffron group-hover:text-white transition">
+              <i class="fa-solid fa-magnifying-glass-location"></i>
+            </div>
+            <h3 class="font-bold text-base text-gov-navy mb-1">Track Grievance</h3>
+            <p class="text-xs text-slate-500 leading-normal">
+              Track live progress of your docket from municipal allocation to field contractor completion.
+            </p>
+          </div>
+          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+            <span>Check Docket Status</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Card 3: Municipal Nodal Officer -->
+        <div onclick="window.app.switchSection('municipality')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center text-xl mb-3 group-hover:bg-purple-700 group-hover:text-white transition">
+              <i class="fa-solid fa-building-columns"></i>
+            </div>
+            <h3 class="font-bold text-base text-gov-navy mb-1">Municipal Admin</h3>
+            <p class="text-xs text-slate-500 leading-normal">
+              Spatial GIS heatmaps, SLA turnaround counters, contractor dispatch, and administrative analytics.
+            </p>
+          </div>
+          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+            <span>Command Dashboard</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+        <!-- Card 4: Contractor / Agency Desk -->
+        <div onclick="window.app.switchSection('contractor')" class="bg-white rounded-xl p-5 border border-gov-border shadow-sm hover:shadow-md hover:border-gov-blue transition cursor-pointer flex flex-col justify-between group">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center text-xl mb-3 group-hover:bg-emerald-700 group-hover:text-white transition">
+              <i class="fa-solid fa-helmet-safety"></i>
+            </div>
+            <h3 class="font-bold text-base text-gov-navy mb-1">Contractor Desk</h3>
+            <p class="text-xs text-slate-500 leading-normal">
+              Field repair assignments, Before vs After evidence upload, and verified milestone disbursement.
+            </p>
+          </div>
+          <div class="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-gov-blue group-hover:text-gov-saffron transition">
+            <span>Field Work Orders</span>
+            <i class="fa-solid fa-arrow-right"></i>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Real-Time National Redressal Dashboard Ticker -->
+      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
+          <div>
+            <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
+              <i class="fa-solid fa-chart-line text-gov-blue"></i> Citywide Grievance Redressal Statistics
+            </h3>
+            <p class="text-xs text-slate-500">Real-time telemetry synchronized with Supabase PostgreSQL cloud database</p>
+          </div>
+          <span class="inline-flex items-center text-[11px] font-semibold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded-full">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping mr-1.5"></span> Live Telemetry
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 pt-1">
+          <div class="p-3 rounded-lg bg-gov-ash border border-slate-200">
+            <p class="text-[11px] font-semibold text-slate-500">Total Grievances</p>
+            <p class="text-2xl font-black text-gov-navy font-mono" id="home-stat-total">--</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gov-ash border border-slate-200">
+            <p class="text-[11px] font-semibold text-slate-500">Disposed / Resolved</p>
+            <p class="text-2xl font-black text-emerald-600 font-mono" id="home-stat-resolved">--</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gov-ash border border-slate-200">
+            <p class="text-[11px] font-semibold text-slate-500">In Process</p>
+            <p class="text-2xl font-black text-gov-blue font-mono" id="home-stat-inprogress">--</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gov-ash border border-slate-200">
+            <p class="text-[11px] font-semibold text-slate-500">Pending Review</p>
+            <p class="text-2xl font-black text-amber-600 font-mono" id="home-stat-pending">--</p>
+          </div>
+          <div class="p-3 rounded-lg bg-gov-ash border border-slate-200 col-span-2 md:col-span-1">
+            <p class="text-[11px] font-semibold text-slate-500">Avg Resolution SLA</p>
+            <p class="text-2xl font-black text-purple-700 font-mono" id="home-stat-sla">21.4 hrs</p>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW B: LODGE CIVIC GRIEVANCE (Citizen Form + AI)     -->
+    <!-- ==================================================== -->
+    <section id="section-lodge" class="page-section hidden space-y-6">
+      
+      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex items-center justify-between">
+        <div>
+          <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
+            <i class="fa-solid fa-pen-to-square text-gov-blue"></i> Lodge Civic Grievance / नागरिक शिकायत दर्ज करें
+          </h2>
+          <p class="text-xs text-slate-500">Fill the online form. Live AI Vision automatically calculates defect severity and GPS proximity.</p>
+        </div>
+        <span class="text-xs font-bold text-gov-saffron bg-amber-50 border border-amber-200 px-3 py-1 rounded-full">
+          +15 Civic Tokens On Submission
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        <!-- Form Left Column -->
+        <div class="lg:col-span-7 bg-white rounded-xl p-6 border border-gov-border shadow-sm space-y-4">
+          
+          <!-- Rapid Presets for Evaluation -->
+          <div>
+            <label class="block text-xs font-bold text-slate-700 mb-1.5">
+              <i class="fa-solid fa-wand-magic-sparkles text-gov-saffron mr-1"></i> Quick Test Scenarios (Select to auto-populate):
+            </label>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              <button type="button" id="preset-pothole" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                <span>🕳️</span> Pothole
+              </button>
+              <button type="button" id="preset-garbage" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                <span>🗑️</span> Waste Dump
+              </button>
+              <button type="button" id="preset-wire" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                <span>⚡</span> Dangling Cable
+              </button>
+              <button type="button" id="preset-water" class="preset-btn px-2.5 py-2 rounded-lg bg-gov-ash hover:bg-blue-50 border border-slate-200 text-left text-xs font-semibold text-slate-700 transition flex items-center gap-1.5">
+                <span>💧</span> Water Leak
+              </button>
+            </div>
+          </div>
+
+          <!-- Grievance Form -->
+          <form id="citizen-report-form" class="space-y-4">
+            
+            <!-- Headline -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Subject / Grievance Headline <span class="text-rose-500">*</span></label>
+              <input type="text" id="report-title" required placeholder="Brief title of the problem" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white transition">
+            </div>
+
+            <!-- Category -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Civic Category <span class="text-rose-500">*</span></label>
+              <select id="report-category" class="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white">
+                <option value="Potholes & Roads">Potholes & Damaged Road Surface (सड़क एवं गड्ढे)</option>
+                <option value="Sanitation & Waste">Garbage Accumulation & Waste Dump (कूड़ा एवं स्वच्छता)</option>
+                <option value="Electrical & Lighting">Street Lights & Overhead Cables (स्ट्रीट लाइट एवं बिजली)</option>
+                <option value="Water & Drainage">Water Main Leakage & Drainage (जलभराव एवं पाइपलाइन)</option>
+              </select>
+            </div>
+
+            <!-- Address & GPS -->
+            <div>
+              <label class="block text-xs font-bold text-slate-700 mb-1">Location Details (Geotagged via GPS) <span class="text-rose-500">*</span></label>
+              <div class="p-2.5 rounded-lg bg-gov-ash border border-slate-200 flex items-center justify-between text-xs">
+                <div class="flex items-center gap-2 truncate">
+                  <i class="fa-solid fa-location-dot text-rose-600"></i>
+                  <span id="report-location-text" class="text-slate-700 text-xs truncate">Near Metro Pillar 142, Outer Ring Road, New Delhi</span>
+                </div>
+                <span class="text-[10px] font-mono text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-bold">GPS LOCKED</span>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <button type="submit" id="submit-btn" class="w-full py-3 px-4 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs md:text-sm shadow-md transition flex items-center justify-center gap-2">
+              <i class="fa-solid fa-paper-plane"></i> Submit Grievance to Municipal Portal
+            </button>
+          </form>
+
+        </div>
+
+        <!-- AI Diagnostic & Preview Right Column -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm space-y-3">
+            <h3 class="text-xs font-bold text-gov-navy uppercase tracking-wider flex items-center justify-between">
+              <span>Evidence Photographic Capture</span>
+              <span class="text-[10px] text-gov-saffron font-bold">AI Scanner Active</span>
+            </h3>
+
+            <div class="relative rounded-lg overflow-hidden border border-slate-200">
+              <img id="photo-preview" src="https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800" alt="Evidence" class="w-full h-44 object-cover">
+              <div class="absolute top-2 left-2 px-2 py-0.5 bg-black/60 backdrop-blur-md rounded text-[10px] text-white font-mono">
+                LIVE CAMERA EXIF: 28.6289° N, 77.2065° E
+              </div>
+            </div>
+
+            <!-- AI Diagnostic Card -->
+            <div id="ai-scan-result" class="p-3 rounded-lg bg-blue-50/70 border border-blue-200 text-xs space-y-1.5 transition-all">
+              <div class="flex items-center justify-between text-gov-blue font-bold">
+                <span class="flex items-center gap-1.5"><i class="fa-solid fa-brain"></i> AI Triage Diagnostic</span>
+                <span class="text-emerald-700 font-mono" id="ai-conf">96.4% Match</span>
+              </div>
+              <p class="text-slate-800 text-xs font-medium" id="ai-detected">Object: Asphalt Surface Damage (Pothole)</p>
+              <div class="flex items-center justify-between text-[11px] text-slate-600 border-t border-blue-100 pt-1">
+                <span>Severity Score: <strong class="text-amber-700" id="ai-sev">HIGH</strong></span>
+                <span>Spatial Duplicate: <strong class="text-emerald-700">Clear (0 within 45m)</strong></span>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Citizen Wallet Mini-Card -->
+          <div class="bg-white rounded-xl p-4 border border-gov-border shadow-sm flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-lg">
+                ⭐
+              </div>
+              <div>
+                <h4 class="font-bold text-gov-navy text-xs" id="citizen-name">Aarav Sharma</h4>
+                <p class="text-[11px] text-slate-500">Citizen Level: <span class="text-amber-700 font-bold" id="citizen-badge">Ward Hero 🥈</span></p>
+              </div>
+            </div>
+            <div class="text-right">
+              <span class="text-xl font-black text-gov-navy font-mono" id="citizen-points">540</span>
+              <p class="text-[10px] text-slate-500 font-bold uppercase">Civic Tokens</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW C: TRACK STATUS (Visual Resolution Progress)    -->
+    <!-- ==================================================== -->
+    <section id="section-track" class="page-section hidden space-y-6">
+      
+      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm">
+        <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
+          <i class="fa-solid fa-magnifying-glass-location text-gov-blue"></i> Track Grievance Status / शिकायत की स्थिति जांचें
+        </h2>
+        <p class="text-xs text-slate-500">Inspect real-time resolution milestones, contractor assignment, and verification proof.</p>
+      </div>
+
+      <div class="bg-white rounded-xl p-6 border border-gov-border shadow-sm space-y-4">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Enter Docket / Issue ID</label>
+          <div class="flex gap-2">
+            <input type="text" id="track-search-input" placeholder="e.g. ISS-8041, ISS-8039" class="px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs md:text-sm flex-1 text-slate-800 focus:outline-none focus:border-gov-blue focus:bg-white font-mono">
+            <button onclick="window.app.searchDocket()" class="px-5 py-2 bg-gov-blue hover:bg-gov-navy text-white text-xs font-bold rounded-lg transition flex items-center gap-2">
+              <i class="fa-solid fa-magnifying-glass"></i> Track
+            </button>
+          </div>
+        </div>
+
+        <!-- Recent Registered Dockets Table -->
+        <div>
+          <h3 class="text-xs font-bold text-slate-600 uppercase tracking-wider mb-2">Registered Grievance Dockets:</h3>
+          <div id="citizen-issues-list" class="space-y-3">
+            <!-- Injected via citizenView.js -->
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW D: MUNICIPAL NODAL OFFICER DASHBOARD            -->
+    <!-- ==================================================== -->
+    <section id="section-municipality" class="page-section hidden space-y-6">
+      
+      <!-- Command Center Header -->
+      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg md:text-xl font-bold text-gov-navy flex items-center gap-2">
+            <i class="fa-solid fa-building-columns text-gov-blue"></i> Municipal Nodal Officer Command Center
+          </h2>
+          <p class="text-xs text-slate-500">Public Works & Urban Infrastructure Division • Central Municipal Zone</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select id="municipality-filter" class="px-3 py-1.5 bg-gov-ash border border-slate-300 rounded-lg text-xs font-semibold text-slate-700">
+            <option value="all">All Grievances</option>
+            <option value="pending">Pending Assignment</option>
+            <option value="in progress">In Progress (SLA Active)</option>
+            <option value="under verification">Under Verification</option>
+            <option value="resolved">Resolved / Disposed</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- KPI Metrics Bar -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="bg-white p-4 rounded-xl border border-gov-border shadow-sm">
+          <p class="text-xs font-semibold text-slate-500">Total Registered</p>
+          <p class="text-2xl font-black text-gov-navy font-mono mt-1" id="stat-total">--</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gov-border shadow-sm">
+          <p class="text-xs font-semibold text-slate-500">Critical Hazards</p>
+          <p class="text-2xl font-black text-rose-600 font-mono mt-1" id="stat-critical">--</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gov-border shadow-sm">
+          <p class="text-xs font-semibold text-slate-500">Resolution Rate</p>
+          <p class="text-2xl font-black text-emerald-600 font-mono mt-1" id="stat-rate">--%</p>
+        </div>
+        <div class="bg-white p-4 rounded-xl border border-gov-border shadow-sm">
+          <p class="text-xs font-semibold text-slate-500">Average Turnaround</p>
+          <p class="text-2xl font-black text-gov-blue font-mono mt-1" id="stat-turnaround">21.4 hrs</p>
+        </div>
+      </div>
+
+      <!-- GIS Map & Triage Table -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- GIS Map Canvas -->
+        <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-gov-border shadow-sm flex flex-col h-[520px]">
+          <div class="flex items-center justify-between mb-2">
+            <div>
+              <h3 class="font-bold text-gov-navy text-xs md:text-sm flex items-center gap-1.5">
+                <i class="fa-solid fa-map-location-dot text-gov-blue"></i> GIS Spatial Grievance Heatmap
+              </h3>
+              <p class="text-[11px] text-slate-500">Geographic clustering of citizen reported infrastructure defects</p>
+            </div>
+            <div class="flex items-center gap-2 text-[10px]">
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-rose-600"></span> Critical</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> High</span>
+              <span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span> Closed</span>
+            </div>
+          </div>
+          <div id="gis-map" class="w-full flex-1 rounded-lg overflow-hidden border border-slate-200 z-10"></div>
+        </div>
+
+        <!-- Issue Allocation Table -->
+        <div class="lg:col-span-6 bg-white p-4 rounded-xl border border-gov-border shadow-sm flex flex-col h-[520px]">
+          <div class="mb-2">
+            <h3 class="font-bold text-gov-navy text-xs md:text-sm flex items-center gap-1.5">
+              <i class="fa-solid fa-list-check text-gov-blue"></i> Grievance Allocation & SLA Monitor
+            </h3>
+            <p class="text-[11px] text-slate-500">Directly assign contractors with enforceable completion timers</p>
+          </div>
+
+          <div class="flex-1 overflow-y-auto custom-scrollbar border border-slate-200 rounded-lg">
+            <table class="w-full text-left text-xs text-slate-700">
+              <thead class="bg-gov-ash sticky top-0 text-[11px] text-slate-600 uppercase tracking-wider border-b border-slate-200">
+                <tr>
+                  <th class="p-2.5">Docket / Title</th>
+                  <th class="p-2.5">Severity</th>
+                  <th class="p-2.5">Status</th>
+                  <th class="p-2.5 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody id="admin-table-body" class="divide-y divide-slate-200">
+                <!-- Injected via municipalityView.js -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW E: CONTRACTOR / AGENCY FIELD DESK               -->
+    <!-- ==================================================== -->
+    <section id="section-contractor" class="page-section hidden space-y-6">
+      
+      <!-- Vendor Card -->
+      <div class="bg-white rounded-xl p-5 border border-gov-border shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center text-2xl font-bold">
+            <i class="fa-solid fa-helmet-safety"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <h2 class="text-base font-bold text-gov-navy">Apex Road Infrastructure Ltd</h2>
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-50 text-gov-blue border border-blue-200">Authorized Vendor</span>
+            </div>
+            <p class="text-xs text-slate-500">Vendor ID: <span class="font-mono text-slate-700 font-semibold">CONT-01</span> • Category: <strong class="text-gov-blue">Potholes & Roads</strong> • Quality Rating: <strong class="text-amber-600">★ 4.8</strong></p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-6 text-center">
+          <div>
+            <span class="text-2xl font-black text-gov-navy font-mono" id="contractor-active-count">1</span>
+            <p class="text-[11px] text-slate-500">Assigned Jobs</p>
+          </div>
+          <div class="w-px h-8 bg-slate-200"></div>
+          <div>
+            <span class="text-2xl font-black text-emerald-600 font-mono">142</span>
+            <p class="text-[11px] text-slate-500">Completed</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Work Orders Grid -->
+      <div>
+        <h3 class="font-bold text-gov-navy text-base mb-3 flex items-center gap-2">
+          <i class="fa-solid fa-screwdriver-wrench text-gov-blue"></i> Assigned Work Orders & Field Proof Upload
+        </h3>
+        <div id="contractor-orders-grid" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Injected via contractorView.js -->
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ==================================================== -->
+    <!-- VIEW F: CIVIC REWARDS & LEADERBOARD                  -->
+    <!-- ==================================================== -->
+    <section id="section-rewards" class="page-section hidden space-y-6">
+      
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        
+        <!-- Left: Web3 Citizen Badge Showcase -->
+        <div class="lg:col-span-5 space-y-4">
+          <div class="bg-gradient-to-br from-gov-navy via-gov-blue to-gov-lightBlue text-white p-6 rounded-xl border border-gov-blue shadow-md space-y-4">
+            <div class="inline-flex items-center px-2.5 py-1 rounded-full bg-white/10 text-gov-saffron text-xs font-bold border border-white/20">
+              <i class="fa-brands fa-ethereum mr-1.5"></i> On-Chain Verifiable Soulbound Badge
+            </div>
+
+            <div class="p-4 rounded-xl bg-white/10 backdrop-blur-md border border-white/10 text-center space-y-2">
+              <div class="w-16 h-16 mx-auto rounded-2xl bg-gradient-to-tr from-amber-400 to-gov-saffron flex items-center justify-center text-3xl shadow-lg shadow-amber-500/20">
+                🛡️
+              </div>
+              <h3 class="text-base font-bold text-white">Civic Guardian Token</h3>
+              <p class="text-xs text-amber-300 font-mono">Token ID: #NAGRIK-8041-DEL</p>
+              <p class="text-[11px] text-slate-200">Conferred by Municipal Corporation of Delhi for 10+ verified community defect resolutions.</p>
+            </div>
+
+            <div class="space-y-1.5 text-xs border-t border-white/15 pt-3">
+              <div class="flex justify-between text-slate-300">
+                <span>Community Civic Tokens:</span>
+                <span class="text-white font-mono font-bold" id="rewards-user-pts">540 Tokens</span>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span>Property Tax Rebate Eligibility:</span>
+                <span class="text-emerald-400 font-bold">10% Active</span>
+              </div>
+              <div class="flex justify-between text-slate-300">
+                <span>Smart City Parking Pass:</span>
+                <span class="text-gov-saffron font-bold">Unlocked (Tier 2)</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Utility Perks Card -->
+          <div class="bg-white p-5 rounded-xl border border-gov-border shadow-sm space-y-3">
+            <h4 class="font-bold text-gov-navy text-xs uppercase tracking-wider">Redeemable Municipal Utilities</h4>
+            <div class="p-3 rounded-lg bg-gov-ash border border-slate-200 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🅿️</span>
+                <div>
+                  <h5 class="text-xs font-bold text-gov-navy">Smart City Parking Pass</h5>
+                  <p class="text-[10px] text-slate-500">30 hrs municipal parking quota</p>
+                </div>
+              </div>
+              <button onclick="window.app.claimReward('Smart Parking Pass')" class="px-3 py-1 bg-gov-blue hover:bg-gov-navy text-white font-bold rounded text-xs transition">Claim</button>
+            </div>
+            <div class="p-3 rounded-lg bg-gov-ash border border-slate-200 flex items-center justify-between">
+              <div class="flex items-center gap-3">
+                <span class="text-xl">🚇</span>
+                <div>
+                  <h5 class="text-xs font-bold text-gov-navy">Metro Green Mobility Pass</h5>
+                  <p class="text-[10px] text-slate-500">₹250 Metro Card direct recharge</p>
+                </div>
+              </div>
+              <button onclick="window.app.claimReward('Metro Voucher')" class="px-3 py-1 bg-gov-blue hover:bg-gov-navy text-white font-bold rounded text-xs transition">Claim</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right: Leaderboard -->
+        <div class="lg:col-span-7 bg-white p-6 rounded-xl border border-gov-border shadow-sm">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-100 pb-3">
+            <div>
+              <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
+                <i class="fa-solid fa-ranking-star text-gov-saffron"></i> Municipal Civic Hero Leaderboard
+              </h3>
+              <p class="text-xs text-slate-500">Leading citizens improving urban infrastructure this month</p>
+            </div>
+            <span class="text-xs text-emerald-700 font-bold bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full">Active Season 4</span>
+          </div>
+
+          <div class="space-y-3" id="leaderboard-container">
+            <!-- Injected via rewardsView.js -->
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ======================================================== -->
+  <!-- 5. MODALS & OVERLAYS                                     -->
+  <!-- ======================================================== -->
+
+  <!-- Modal: Assign Contractor (Municipality) -->
+  <div id="assign-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-md bg-white border border-slate-300 rounded-xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
+          <i class="fa-solid fa-user-plus text-gov-blue"></i> Allocate Contractor
+        </h3>
+        <button onclick="window.app.closeAssignModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <div class="space-y-3">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Target Grievance</label>
+          <p id="modal-issue-title" class="text-xs font-semibold text-slate-800 bg-gov-ash p-2 rounded border border-slate-200 truncate"></p>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Select Empanelled Contractor</label>
+          <select id="modal-contractor-select" class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800 focus:outline-none focus:border-gov-blue">
+            <!-- Injected dynamically -->
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 mb-1">Enforced Resolution SLA Window</label>
+          <select id="modal-sla-select" class="w-full px-3 py-2 bg-gov-ash border border-slate-300 rounded-lg text-xs text-slate-800">
+            <option value="12">12 Hours (Emergency / High Hazard)</option>
+            <option value="24" selected>24 Hours (Standard Civic SLA)</option>
+            <option value="48">48 Hours (Major Civil Works)</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+        <button onclick="window.app.closeAssignModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+        <button onclick="window.app.confirmAssignment()" class="px-4 py-2 rounded-lg bg-gov-blue hover:bg-gov-navy text-white font-bold text-xs shadow">Confirm Allocation</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal: Citizen Resolution Verification -->
+  <div id="verify-modal" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="w-full max-w-lg bg-white border border-slate-300 rounded-xl p-6 shadow-2xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+        <h3 class="font-bold text-gov-navy text-base flex items-center gap-2">
+          <i class="fa-solid fa-circle-check text-emerald-600"></i> Verify Resolution Proof
+        </h3>
+        <button onclick="window.app.closeVerifyModal()" class="text-slate-400 hover:text-slate-700 text-sm"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-600">The assigned contractor has submitted repair evidence. Inspect the Before vs After photo evidence:</p>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <p class="text-[11px] font-bold text-slate-500 mb-1">BEFORE (Citizen Report)</p>
+          <img id="verify-before-img" src="" class="w-full h-36 object-cover rounded-lg border border-slate-200">
+        </div>
+        <div>
+          <p class="text-[11px] font-bold text-emerald-700 mb-1">AFTER (Field Repair Proof)</p>
+          <img id="verify-after-img" src="" class="w-full h-36 object-cover rounded-lg border-2 border-emerald-500">
+        </div>
+      </div>
+
+      <div class="bg-gov-ash p-3 rounded-lg border border-slate-200 text-xs">
+        <p class="text-slate-500 font-semibold">Contractor Execution Notes:</p>
+        <p id="verify-notes" class="text-slate-800 mt-1 font-medium"></p>
+      </div>
+
+      <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+        <button onclick="window.app.closeVerifyModal()" class="px-4 py-2 rounded-lg border border-slate-300 text-xs text-slate-600">Close</button>
+        <button onclick="window.app.confirmCitizenVerification()" class="px-5 py-2.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs shadow-md flex items-center gap-1.5">
+          <i class="fa-solid fa-check-double"></i> Confirm & Claim +45 Tokens
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ======================================================== -->
+  <!-- 6. GOVERNMENT PORTAL FOOTER (Authentic NIC Style)        -->
+  <!-- ======================================================== -->
+  <footer class="bg-gov-navy text-white text-xs border-t-4 border-gov-saffron mt-auto">
+    <div class="max-w-7xl mx-auto px-4 py-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+      
+      <div class="space-y-2">
+        <h4 class="font-bold text-gov-saffron text-sm uppercase">About CivicSamadhan</h4>
+        <p class="text-slate-300 text-[11px] leading-relaxed">
+          CivicSamadhan is an autonomous, single-window civic grievance monitoring platform built under the Smart Cities Mission to guarantee time-bound infrastructure redressal.
+        </p>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-gov-saffron text-sm uppercase">Useful Links</h4>
+        <ul class="space-y-1 text-slate-300 text-[11px]">
+          <li><a href="#" class="hover:text-gov-saffron">Citizen Charter</a></li>
+          <li><a href="#" class="hover:text-gov-saffron">Grievance Redressal Mechanism</a></li>
+          <li><a href="#" class="hover:text-gov-saffron">Municipal Vendor Empanelment</a></li>
+          <li><a href="#" class="hover:text-gov-saffron">Terms of Use & Privacy Policy</a></li>
+        </ul>
+      </div>
+
+      <div class="space-y-1.5">
+        <h4 class="font-bold text-gov-saffron text-sm uppercase">Support & Helplines</h4>
+        <ul class="space-y-1 text-slate-300 text-[11px]">
+          <li><i class="fa-solid fa-phone mr-1.5 text-gov-saffron"></i> 1800-11-2026 (Toll Free)</li>
+          <li><i class="fa-solid fa-envelope mr-1.5 text-gov-saffron"></i> grievance@civicsamadhan.gov.in</li>
+          <li><i class="fa-solid fa-clock mr-1.5 text-gov-saffron"></i> Mon - Sat: 9:00 AM - 6:00 PM</li>
+        </ul>
+      </div>
+
+      <div class="space-y-2">
+        <h4 class="font-bold text-gov-saffron text-sm uppercase">Technical Standards</h4>
+        <p class="text-[11px] text-slate-300">
+          Designed and developed for smart urban governance. Compliant with GIGW (Guidelines for Indian Government Websites).
+        </p>
+        <p class="text-[10px] text-slate-400 font-mono">Build Version: 2.1.0 • Supabase Cloud Verified</p>
+      </div>
+
+    </div>
+
+    <div class="bg-gov-navy/90 border-t border-slate-700 py-3 text-center text-[11px] text-slate-400">
+      © 2026 CivicSamadhan Platform. All Rights Reserved. Ministry of Housing & Urban Affairs, Government of India.
+    </div>
+  </footer>
+
+  <script type="module" src="/src/js/app.js"></script>
+</body>
+</html>

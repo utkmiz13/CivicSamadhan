@@ -1,0 +1,19 @@
+{
+  "name": "civicsamdhaan",
+  "version": "1.0.0",
+  "description": "CivicSamadhan - Centralized Civic Grievance Redressal and Monitoring System",
+  "scripts": {
+    "start": "node backend/server.js",
+    "dev": "node --watch backend/server.js"
+  },
+  "keywords": [
+    "civicsamadhan",
+    "e-samadhan",
+    "smart-city",
+    "supabase",
+    "grievance-redressal",
+    "hackathon"
+  ],
+  "author": "Utkarsh Mishra",
+  "license": "MIT"
+}

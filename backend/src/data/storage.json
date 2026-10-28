@@ -1,0 +1,222 @@
+{
+  "issues": [
+    {
+      "id": "ISS-8041",
+      "title": "Severe Pothole on Outer Ring Road near Pillar 142",
+      "description": "Deep asphalt crater (~12cm) causing dangerous swerving for two-wheelers during night traffic.",
+      "category": "Potholes & Roads",
+      "severity": "High",
+      "status": "In Progress",
+      "location": {
+        "address": "Near Metro Pillar 142, Outer Ring Road, New Delhi",
+        "lat": 28.6289,
+        "lng": 77.2065
+      },
+      "reportedBy": {
+        "name": "Aarav Sharma",
+        "phone": "+91 98765 43210",
+        "userId": "USR-101"
+      },
+      "reportedAt": "2026-10-28T03:14:51.162766+00:00",
+      "imageUrl": "https://images.unsplash.com/photo-1515162816999-a0c47dc192f7?w=800&auto=format&fit=crop&q=80",
+      "assignedTo": {
+        "name": "Apex Road Infrastructure Ltd",
+        "deadline": "2026-10-28T09:15:00.000Z",
+        "slaHours": 24,
+        "assignedAt": "2026-10-27T09:15:00.000Z",
+        "contractorId": "CONT-01"
+      },
+      "resolution": null,
+      "aiMetadata": {
+        "confidence": 96.4,
+        "hazardScore": 8.5,
+        "detectedObject": "Asphalt Surface Crater"
+      }
+    },
+    {
+      "id": "ISS-8042",
+      "title": "Overflowing Municipal Dumpster near Market Gate",
+      "description": "Solid waste overflowing for 4 days. Foul smell and stray animal congregation affecting local shops.",
+      "category": "Sanitation & Waste",
+      "severity": "Critical",
+      "status": "Pending",
+      "location": {
+        "address": "Sector 14 Main Market, Block B, Gurugram",
+        "lat": 28.4715,
+        "lng": 77.0524
+      },
+      "reportedBy": {
+        "name": "Priya Nair",
+        "phone": "+91 98111 22334",
+        "userId": "USR-102"
+      },
+      "reportedAt": "2026-10-28T03:14:51.162766+00:00",
+      "imageUrl": "https://images.unsplash.com/photo-1605600659908-0ef719419d41?w=800&auto=format&fit=crop&q=80",
+      "assignedTo": null,
+      "resolution": null,
+      "aiMetadata": {
+        "confidence": 98.1,
+        "hazardScore": 9.2,
+        "detectedObject": "Municipal Solid Waste Overflow"
+      }
+    },
+    {
+      "id": "ISS-8039",
+      "title": "Snapped High-Voltage Streetlight Cable Near School",
+      "description": "Storm damage dislodged overhead cable. Dangling live wire within pedestrian reach near primary gate.",
+      "category": "Electrical & Lighting",
+      "severity": "Critical",
+      "status": "Under Verification",
+      "location": {
+        "address": "Ward 9, Near St. Xavier School, Civil Lines",
+        "lat": 28.675,
+        "lng": 77.2215
+      },
+      "reportedBy": {
+        "name": "Rohan Verma",
+        "phone": "+91 97234 56789",
+        "userId": "USR-103"
+      },
+      "reportedAt": "2026-10-28T03:14:51.162766+00:00",
+      "imageUrl": "https://images.unsplash.com/photo-1508873696983-2df5293cb32f?w=800&auto=format&fit=crop&q=80",
+      "assignedTo": {
+        "name": "Urja Grid Maintenance Services",
+        "deadline": "2026-10-27T03:00:00.000Z",
+        "slaHours": 12,
+        "assignedAt": "2026-10-26T15:00:00.000Z",
+        "contractorId": "CONT-03"
+      },
+      "resolution": {
+        "notes": "Loose feeder cable re-anchored, insulated junction box replaced, luminaire inspected.",
+        "resolvedAt": "2026-10-27T07:45:00.000Z",
+        "resolvedImageUrl": "https://images.unsplash.com/photo-1541888946425-d0fbb1861593?w=800&auto=format&fit=crop&q=80",
+        "verifiedByCitizen": false
+      },
+      "aiMetadata": {
+        "confidence": 94.7,
+        "hazardScore": 9.8,
+        "detectedObject": "Exposed High-Voltage Conductor"
+      }
+    },
+    {
+      "id": "ISS-8035",
+      "title": "Clean Water Pipeline Rupture Submerging Road",
+      "description": "High pressure potable water mains breach. Erosion under road foundation and drinking water loss.",
+      "category": "Water & Drainage",
+      "severity": "Moderate",
+      "status": "Resolved",
+      "location": {
+        "address": "Jal Vihar Road, Near Water Tank No. 3",
+        "lat": 28.568,
+        "lng": 77.243
+      },
+      "reportedBy": {
+        "name": "Sunita Deshmukh",
+        "phone": "+91 99887 76655",
+        "userId": "USR-104"
+      },
+      "reportedAt": "2026-10-28T03:14:51.162766+00:00",
+      "imageUrl": "https://images.unsplash.com/photo-1584438784894-089d6a62b8fa?w=800&auto=format&fit=crop&q=80",
+      "assignedTo": {
+        "name": "JalSetu Pipeline Engineering",
+        "deadline": "2026-10-26T12:00:00.000Z",
+        "slaHours": 24,
+        "assignedAt": "2026-10-25T12:00:00.000Z",
+        "contractorId": "CONT-02"
+      },
+      "resolution": {
+        "notes": "Main clamp gasket replaced. Pressure tested to 4.5 bar with zero seepage.",
+        "resolvedAt": "2026-10-26T09:30:00.000Z",
+        "citizenFeedback": "Prompt resolution, leakage halted within 24 hours.",
+        "resolvedImageUrl": "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=800&auto=format&fit=crop&q=80",
+        "verifiedByCitizen": true,
+        "rewardPointsIssued": 45
+      },
+      "aiMetadata": {
+        "confidence": 95.2,
+        "hazardScore": 6.8,
+        "detectedObject": "Pipeline Rupture & Surface Flow"
+      }
+    }
+  ],
+  "contractors": [
+    {
+      "id": "CONT-01",
+      "name": "Apex Road Infrastructure Ltd",
+      "category": "Potholes & Roads",
+      "rating": 4.8,
+      "completedJobs": 142,
+      "activeJobs": 3,
+      "avgTurnaroundHours": 14.5
+    },
+    {
+      "id": "CONT-02",
+      "name": "JalSetu Pipeline Engineering",
+      "category": "Water & Drainage",
+      "rating": 4.6,
+      "completedJobs": 98,
+      "activeJobs": 2,
+      "avgTurnaroundHours": 18.2
+    },
+    {
+      "id": "CONT-03",
+      "name": "Urja Grid Maintenance Services",
+      "category": "Electrical & Lighting",
+      "rating": 4.9,
+      "completedJobs": 215,
+      "activeJobs": 1,
+      "avgTurnaroundHours": 6.8
+    },
+    {
+      "id": "CONT-04",
+      "name": "Swachh Bharat Cleaners Pvt Ltd",
+      "category": "Sanitation & Waste",
+      "rating": 4.5,
+      "completedJobs": 320,
+      "activeJobs": 5,
+      "avgTurnaroundHours": 8.1
+    }
+  ],
+  "leaderboard": [
+    {
+      "rank": 1,
+      "userId": "USR-105",
+      "name": "Rajesh Kumar",
+      "avatar": "👨‍💼",
+      "points": 820,
+      "issuesResolved": 18,
+      "badge": "Urban Guardian 🥇",
+      "tier": "Platinum"
+    },
+    {
+      "rank": 2,
+      "userId": "USR-101",
+      "name": "Aarav Sharma (You)",
+      "avatar": "⭐",
+      "points": 540,
+      "issuesResolved": 11,
+      "badge": "Ward Hero 🥈",
+      "tier": "Gold"
+    },
+    {
+      "rank": 3,
+      "userId": "USR-102",
+      "name": "Priya Nair",
+      "avatar": "👩‍💻",
+      "points": 460,
+      "issuesResolved": 9,
+      "badge": "Civic Sentinel 🥉",
+      "tier": "Silver"
+    },
+    {
+      "rank": 4,
+      "userId": "USR-106",
+      "name": "Dr. Manpreet Singh",
+      "avatar": "👨‍⚕️",
+      "points": 390,
+      "issuesResolved": 8,
+      "badge": "Green Scout",
+      "tier": "Bronze"
+    }
+  ]
+}

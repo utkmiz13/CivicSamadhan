@@ -1,0 +1,87 @@
+/**
+ * JanSetu REST API Client
+ * Encapsulates network operations, headers, and error handling.
+ */
+
+const API_BASE = '/api';
+
+export const apiClient = {
+  /**
+   * Helper to execute fetch requests with consistent error handling
+   */
+  async request(endpoint, options = {}) {
+    const role = window.currentRole || 'citizen';
+    const config = {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-user-role': role,
+        ...options.headers
+      },
+      ...options
+    };
+
+    try {
+      const response = await fetch(`${API_BASE}${endpoint}`, config);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || `HTTP error ${response.status}`);
+      }
+      return data;
+    } catch (error) {
+      console.error(`[API Error] ${endpoint}:`, error.message);
+      throw error;
+    }
+  },
+
+  // Issues
+  fetchIssues(params = {}) {
+    const query = new URLSearchParams(params).toString();
+    return this.request(`/issues${query ? '?' + query : ''}`);
+  },
+
+  createIssue(payload) {
+    return this.request('/issues', {
+      method: 'POST',
+      body: JSON.stringify(payload)
+    });
+  },
+
+  assignContractor(issueId, contractorId, slaHours = 24) {
+    return this.request(`/issues/${issueId}/assign`, {
+      method: 'POST',
+      body: JSON.stringify({ contractorId, slaHours })
+    });
+  },
+
+  submitResolution(issueId, resolvedImageUrl, notes) {
+    return this.request(`/issues/${issueId}/resolve`, {
+      method: 'POST',
+      body: JSON.stringify({ resolvedImageUrl, notes })
+    });
+  },
+
+  verifyResolution(issueId, feedback = '', satisfied = true) {
+    return this.request(`/issues/${issueId}/verify`, {
+      method: 'POST',
+      body: JSON.stringify({ feedback, satisfied })
+    });
+  },
+
+  // System Stats & Reference
+  fetchStats() {
+    return this.request('/stats');
+  },
+
+  fetchContractors() {
+    return this.request('/contractors');
+  },
+
+  fetchLeaderboard() {
+    return this.request('/leaderboard');
+  },
+
+  resetDatabase() {
+    return this.request('/reset', { method: 'POST' });
+  }
+};
+
