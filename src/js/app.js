@@ -77,7 +77,6 @@ class ApplicationController {
   openAuthModal(mode = 'signup') {
     this.authMode = mode;
     this.authStep = 'details';
-    this.currentDevOtp = null;
 
     const modal = document.getElementById('auth-modal');
     const title = document.getElementById('auth-modal-title');
@@ -142,34 +141,24 @@ class ApplicationController {
       if (this.authMode === 'signup') {
         const res = await apiClient.sendOtp({ name, email, phone, role, password });
         this.pendingSignupData = { name, email, phone, role, password };
-        this.currentDevOtp = res.devOtp;
 
         // Switch to OTP step inside modal
         this.authStep = 'otp';
         const stepDetails = document.getElementById('auth-step-details');
         const stepOtp = document.getElementById('auth-step-otp');
         const otpTargetEmail = document.getElementById('otp-target-email');
-        const otpDevAssist = document.getElementById('otp-dev-assist');
-        const otpDevCode = document.getElementById('otp-dev-code');
         const otpInput = document.getElementById('auth-otp-input');
 
         if (stepDetails) stepDetails.classList.add('hidden');
         if (stepOtp) stepOtp.classList.remove('hidden');
         if (otpTargetEmail) otpTargetEmail.textContent = email;
 
-        if (res.devOtp && otpDevAssist && otpDevCode) {
-          otpDevCode.textContent = res.devOtp;
-          otpDevAssist.classList.remove('hidden');
-        } else if (otpDevAssist) {
-          otpDevAssist.classList.add('hidden');
-        }
-
         if (otpInput) {
           otpInput.value = '';
           setTimeout(() => otpInput.focus(), 150);
         }
 
-        this.showToast(`📧 6-digit OTP sent to ${email}!`, 'info');
+        this.showToast(res.message || `📧 6-digit OTP sent to ${email}! Check your inbox.`, 'info');
       } else {
         const res = await apiClient.login({ email, password });
         if (res.success && res.user) {
@@ -198,16 +187,6 @@ class ApplicationController {
     }
   }
 
-  autofillOtp() {
-    if (this.currentDevOtp) {
-      const otpInput = document.getElementById('auth-otp-input');
-      if (otpInput) {
-        otpInput.value = this.currentDevOtp;
-        this.showToast('OTP auto-filled!', 'success');
-      }
-    }
-  }
-
   backToDetails() {
     this.authStep = 'details';
     document.getElementById('auth-step-details')?.classList.remove('hidden');
@@ -222,10 +201,7 @@ class ApplicationController {
     try {
       this.showToast('Re-dispatching OTP to ' + this.pendingSignupData.email + '...', 'info');
       const res = await apiClient.sendOtp(this.pendingSignupData);
-      this.currentDevOtp = res.devOtp;
-      const otpDevCode = document.getElementById('otp-dev-code');
-      if (otpDevCode && res.devOtp) otpDevCode.textContent = res.devOtp;
-      this.showToast('New OTP dispatched!', 'success');
+      this.showToast(res.message || 'New OTP dispatched! Check your email inbox.', 'success');
     } catch (err) {
       this.showToast(err.message, 'error');
     }
@@ -235,7 +211,7 @@ class ApplicationController {
     const otpInput = document.getElementById('auth-otp-input');
     const otp = otpInput?.value?.trim();
     if (!otp || otp.length !== 6) {
-      this.showToast('Please enter the full 6-digit OTP code.', 'error');
+      this.showToast('Please enter the full 6-digit OTP code received in your email.', 'error');
       return;
     }
 
@@ -249,13 +225,17 @@ class ApplicationController {
     const origText = verifyBtn ? verifyBtn.innerHTML : '';
     if (verifyBtn) {
       verifyBtn.disabled = true;
-      verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Verifying OTP & Registering in Supabase...';
+      verifyBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin mr-1.5"></i> Verifying with Supabase & Storing Password...';
     }
 
     try {
       const res = await apiClient.verifyOtp({
         email: this.pendingSignupData.email,
-        otp
+        otp,
+        password: this.pendingSignupData.password,
+        name: this.pendingSignupData.name,
+        phone: this.pendingSignupData.phone,
+        role: this.pendingSignupData.role
       });
 
       if (res.success && res.user) {
@@ -263,7 +243,7 @@ class ApplicationController {
         localStorage.setItem('civic_user', JSON.stringify(res.user));
         this.updateUserSessionUI();
         this.closeAuthModal();
-        this.showToast(res.message || `🎉 Welcome, ${res.user.name}!`, 'success');
+        this.showToast(res.message || `🎉 Welcome to CivicSamadhan, ${res.user.name}!`, 'success');
         await this.refreshData();
 
         if (res.user.role === 'contractor') {

@@ -5,7 +5,6 @@
  */
 
 const { getLocalStorage, saveLocalStorage } = require('../config/supabase');
-const { sendOtpEmail } = require('../utils/mailer');
 const https = require('https');
 
 const SUPABASE_URL = process.env.SUPABASE_URL || 'https://irgxrbovjxocmecsyfbd.supabase.co';
@@ -86,7 +85,7 @@ function supabaseAdminRequest(endpoint, method = 'POST', payload = null) {
 
 const authController = {
   /**
-   * 1. Send OTP to User's Email for Registration
+   * 1. Send OTP to User's Email for Registration (Real Supabase Email Dispatch)
    */
   sendOtp: async (req, res) => {
     const { name, email, phone, role, password } = req.body || {};
@@ -100,147 +99,112 @@ const authController = {
 
     const cleanEmail = email.trim().toLowerCase();
 
-    // Check if user already exists in local storage
-    const storage = getLocalStorage();
-    const existing = (storage.users || []).find(u => u.email.toLowerCase() === cleanEmail);
-    if (existing && existing.confirmed) {
-      return res.status(400).json({
-        success: false,
-        error: 'An account with this email address already exists. Please sign in with your password.'
-      });
-    }
-
-    // Generate secure 6-digit OTP
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = Date.now() + 10 * 60 * 1000; // 10 minutes
-
+    // Cache pending registration details for post-verification password set
     pendingRegistrations.set(cleanEmail, {
-      otp,
       name: name.trim(),
       email: cleanEmail,
       phone: phone ? phone.trim() : '',
       role: role.toLowerCase(),
-      password,
-      expiresAt
+      password
     });
 
-    // Send OTP via email (TLS / SMTP client)
-    let emailSent = false;
+    // Send real OTP email via Supabase Auth
     try {
-      const emailRes = await sendOtpEmail(cleanEmail, otp, name.trim());
-      emailSent = Boolean(emailRes.sent);
-    } catch (e) {
-      console.warn('[Mailer Send Warning]', e.message);
-    }
+      const authRes = await supabaseAuthRequest('otp', {
+        email: cleanEmail,
+        create_user: true
+      });
 
-    return res.json({
-      success: true,
-      message: `Verification OTP dispatched to ${cleanEmail}!`,
-      email: cleanEmail,
-      devOtp: otp, // Surfaced for instant verification & testing without email delay
-      emailSent
-    });
+      if (!authRes.ok) {
+        const errMsg = authRes.error?.msg || authRes.error?.message || 'Failed to dispatch OTP';
+        if (authRes.error?.error_code === 'over_email_send_rate_limit') {
+          return res.status(429).json({
+            success: false,
+            error: '📧 Email rate limit reached on Supabase. Please wait a few minutes before trying again.'
+          });
+        }
+        return res.status(400).json({ success: false, error: errMsg });
+      }
+
+      console.log(`[Supabase Auth] 📨 Real OTP email dispatched to ${cleanEmail}`);
+
+      return res.json({
+        success: true,
+        message: `A 6-digit verification code has been dispatched to ${cleanEmail}. Please check your email inbox and spam folder.`,
+        email: cleanEmail
+      });
+    } catch (err) {
+      return res.status(500).json({ success: false, error: err.message });
+    }
   },
 
   /**
    * 2. Verify OTP, Create Confirmed User in Supabase with Password, and Log In
    */
   verifyOtp: async (req, res) => {
-    const { email, otp } = req.body || {};
+    const { email, otp, password, name, phone, role } = req.body || {};
 
     if (!email || !otp) {
       return res.status(400).json({ success: false, error: 'Email and 6-digit OTP are required.' });
     }
 
     const cleanEmail = email.trim().toLowerCase();
-    const pending = pendingRegistrations.get(cleanEmail);
+    const cleanOtp = otp.trim();
+    const pending = pendingRegistrations.get(cleanEmail) || {};
+    const finalPassword = password || pending.password;
+    const finalName = name || pending.name;
+    const finalPhone = phone || pending.phone || '';
+    const finalRole = role || pending.role || 'citizen';
 
-    if (!pending) {
-      return res.status(400).json({
-        success: false,
-        error: 'No active OTP request found for this email. Please request a new OTP.'
-      });
-    }
-
-    if (Date.now() > pending.expiresAt) {
-      pendingRegistrations.delete(cleanEmail);
-      return res.status(400).json({
-        success: false,
-        error: 'OTP code has expired. Please request a new OTP.'
-      });
-    }
-
-    if (pending.otp !== otp.trim()) {
-      return res.status(400).json({
-        success: false,
-        error: '❌ Invalid OTP code. Please check your email and enter the 6-digit code.'
-      });
-    }
-
-    // OTP verified successfully!
     try {
-      let authUserId = null;
+      // 1. Strictly verify OTP with Supabase
+      const authRes = await supabaseAuthRequest('verify', {
+        type: 'email',
+        email: cleanEmail,
+        token: cleanOtp
+      });
 
-      // Attempt Supabase Admin API user creation with confirmed status & password
-      try {
-        const adminCreate = await supabaseAdminRequest('users', 'POST', {
-          email: cleanEmail,
-          password: pending.password,
-          email_confirm: true,
-          user_metadata: {
-            name: pending.name,
-            phone: pending.phone,
-            role: pending.role
-          }
+      if (!authRes.ok) {
+        return res.status(400).json({
+          success: false,
+          error: '❌ Invalid or expired OTP code. Please check your email and enter the correct 6-digit code.'
         });
+      }
 
-        if (adminCreate.ok && adminCreate.data?.id) {
-          authUserId = adminCreate.data.id;
-          console.log(`[Supabase Admin] ✅ User ${cleanEmail} created in Supabase Auth (${authUserId})`);
-        } else {
-          // If already in Supabase, update password & confirm status
-          const listUsers = await supabaseAdminRequest('users', 'GET');
-          const existingAuth = listUsers.ok && Array.isArray(listUsers.data?.users)
-            ? listUsers.data.users.find(u => u.email.toLowerCase() === cleanEmail)
-            : null;
+      const accessToken = authRes.data?.access_token;
+      const authUser = authRes.data?.user;
 
-          if (existingAuth) {
-            authUserId = existingAuth.id;
-            await supabaseAdminRequest(`users/${authUserId}`, 'PUT', {
-              password: pending.password,
-              email_confirm: true,
-              user_metadata: {
-                name: pending.name,
-                phone: pending.phone,
-                role: pending.role
-              }
-            });
-            console.log(`[Supabase Admin] ✅ User ${cleanEmail} updated in Supabase Auth (${authUserId})`);
-          }
+      // 2. Set the password in Supabase using Admin API
+      if (finalPassword && authUser?.id) {
+        try {
+          await supabaseAdminRequest(`users/${authUser.id}`, 'PUT', {
+            password: finalPassword,
+            email_confirm: true,
+            user_metadata: {
+              name: finalName,
+              phone: finalPhone,
+              role: finalRole
+            }
+          });
+          console.log(`[Supabase Admin] ✅ Password & metadata set for user ${authUser.id}`);
+        } catch (pwErr) {
+          console.warn('[Supabase Set Password Error]', pwErr.message);
         }
-      } catch (cloudErr) {
-        console.warn('[Supabase Cloud Auth Warning]', cloudErr.message);
       }
 
-      if (!authUserId) {
-        authUserId = `USR-${Math.floor(1000 + Math.random() * 9000)}`;
-      }
-
-      // Save user to storage and database
+      // 3. Save to local storage & leaderboard
       const storage = getLocalStorage();
       storage.users = storage.users || [];
-
-      // Remove any duplicate
       storage.users = storage.users.filter(u => u.email.toLowerCase() !== cleanEmail);
 
       const newUser = {
-        id: authUserId,
-        name: pending.name,
+        id: authUser.id,
+        name: finalName || cleanEmail.split('@')[0],
         email: cleanEmail,
-        phone: pending.phone,
-        role: pending.role,
-        password: pending.password, // Persisted for credential verification
-        points: 100, // Joining bonus points
+        phone: finalPhone,
+        role: finalRole,
+        password: finalPassword,
+        points: 100,
         badge: 'Civic Novice 🥉',
         confirmed: true,
         createdAt: new Date().toISOString()
@@ -248,10 +212,9 @@ const authController = {
 
       storage.users.push(newUser);
 
-      // Add to leaderboard
-      if (pending.role === 'citizen') {
+      if (finalRole === 'citizen') {
         storage.leaderboard = storage.leaderboard || [];
-        storage.leaderboard = storage.leaderboard.filter(u => u.userId !== authUserId);
+        storage.leaderboard = storage.leaderboard.filter(u => u.userId !== authUser.id);
         storage.leaderboard.push({
           rank: storage.leaderboard.length + 1,
           userId: newUser.id,
@@ -263,8 +226,7 @@ const authController = {
         });
       }
 
-      // Register contractor if role is contractor
-      if (pending.role === 'contractor') {
+      if (finalRole === 'contractor') {
         storage.contractors = storage.contractors || [];
         if (!storage.contractors.some(c => c.name === newUser.name)) {
           storage.contractors.push({
@@ -285,7 +247,7 @@ const authController = {
       return res.status(200).json({
         success: true,
         message: `🎉 Account verified and registered! Welcome, ${newUser.name}!`,
-        token: `session_${newUser.id}_${Date.now()}`,
+        token: accessToken || `session_${newUser.id}_${Date.now()}`,
         user: {
           id: newUser.id,
           name: newUser.name,
@@ -298,7 +260,7 @@ const authController = {
       });
     } catch (err) {
       console.error('[Verify OTP Error]', err);
-      return res.status(500).json({ success: false, error: 'Registration error: ' + err.message });
+      return res.status(500).json({ success: false, error: err.message });
     }
   },
 

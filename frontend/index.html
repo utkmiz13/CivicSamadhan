@@ -938,16 +938,13 @@
 
           <div class="space-y-1.5">
             <label class="block text-[11px] font-bold text-slate-600 text-center uppercase tracking-wider">6-Digit OTP Code</label>
-            <input type="text" id="auth-otp-input" maxlength="6" pattern="[0-9]{6}" placeholder="• • • • • •"
+            <input type="text" id="auth-otp-input" maxlength="6" inputmode="numeric" autocomplete="one-time-code" placeholder="• • • • • •"
               class="w-full text-center font-mono text-2xl tracking-[0.4em] py-2.5 bg-slate-50 border-2 border-slate-300 focus:border-gov-blue rounded-xl font-bold text-gov-navy focus:outline-none focus:bg-white transition">
           </div>
 
-          <!-- Dev / Demo Helper Badge -->
-          <div id="otp-dev-assist" class="hidden p-2.5 rounded-lg bg-emerald-50 border border-emerald-200 text-xs flex items-center justify-between">
-            <span class="text-emerald-800 font-medium text-[11px]"><i class="fa-solid fa-bolt mr-1"></i> Received OTP: <strong id="otp-dev-code" class="font-mono text-xs"></strong></span>
-            <button type="button" onclick="window.app.autofillOtp()" class="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded text-[10px] font-bold shadow-sm">
-              Auto-Fill
-            </button>
+          <div class="p-2.5 rounded-lg bg-blue-50 border border-blue-200 text-xs text-gov-blue text-center flex items-center justify-center gap-1.5">
+            <i class="fa-solid fa-envelope-open-text text-sm"></i>
+            <span>Check your email inbox (and Spam folder) for the 6-digit code.</span>
           </div>
 
           <button type="button" id="auth-verify-btn" onclick="window.app.handleOtpVerify()"
